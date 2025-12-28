@@ -1,27 +1,54 @@
+import prisma from "../config/db.js";
 import QRCode from "qrcode";
-import slugify from "slugify";
+import crypto from "crypto";
+import { PLANS } from "../config/plans.js";
 
 export const createEvent = async (req, res) => {
-  const user = req.user;
+  try {
+    const user = req.user;
+    const { eventType } = req.body;
 
-  if (!user.isActive) {
-    return res.status(403).json({ message: "Payment required" });
+    // 1️⃣ Payment gate
+    if (!user.isPaid) {
+      return res.status(403).json({ message: "Payment required" });
+    }
+
+    // 2️⃣ Create Event
+    const event = await prisma.event.create({
+      data: {
+        eventType,
+        userId: user.id,
+      },
+    });
+
+    // 3️⃣ Generate album public token
+    const publicToken = crypto.randomUUID();
+
+    // 4️⃣ Determine upload limit from plan
+    const uploadLimit = PLANS[user.plan].uploadLimit;
+
+    // 5️⃣ Create Album
+    const album = await prisma.album.create({
+      data: {
+        eventId: event.id,
+        publicToken,
+        uploadLimit,
+      },
+    });
+
+    // 6️⃣ Generate QR for album
+    const uploadUrl = `${process.env.FRONTEND_URL}/upload/${publicToken}`;
+    const qrCodeBase64 = await QRCode.toDataURL(uploadUrl);
+
+    // 7️⃣ Return everything frontend needs
+    res.status(201).json({
+      event,
+      album,
+      qrCode: qrCodeBase64,
+      uploadUrl,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to create event" });
   }
-
-  const slug = slugify(req.body.title + Date.now());
-  const uploadUrl = `${process.env.FRONTEND_URL}/upload/${slug}`;
-  const qrCode = await QRCode.toDataURL(uploadUrl);
-
-  const event = await prisma.event.create({
-    data: {
-      title: req.body.title,
-      slug,
-      qrCodeUrl: qrCode,
-      userId: user.id,
-      guestLimit: user.maxGuests,
-      photoLimit: user.maxPhotos,
-    },
-  });
-
-  res.json(event);
 };

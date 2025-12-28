@@ -70,8 +70,6 @@ export const stripeWebhook = async (req, res) => {
       data: {
         isActive: true,
         plan,
-        maxGuests: planConfig.guests,
-        maxPhotos: planConfig.photos,
       },
     });
   }
