@@ -1,30 +1,23 @@
 "use client";
 
-import { Calendar, Images, User, CreditCard, LogOut } from "lucide-react";
+import { useState } from "react";
+import {
+  Calendar,
+  Images,
+  User,
+  CreditCard,
+  LogOut,
+  Menu,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  {
-    label: "Events",
-    href: "/dashboard/event",
-    icon: Calendar,
-  },
-  {
-    label: "Albums",
-    href: "/dashboard/album",
-    icon: Images,
-  },
-  {
-    label: "Account",
-    href: "/dashboard/account",
-    icon: User,
-  },
-  {
-    label: "Billing",
-    href: "/dashboard/billing",
-    icon: CreditCard,
-  },
+  { label: "Events", href: "/dashboard/event", icon: Calendar },
+  { label: "Albums", href: "/dashboard/album", icon: Images },
+  { label: "Account", href: "/dashboard/account", icon: User },
+  { label: "Billing", href: "/pricing", icon: CreditCard },
 ];
 
 export default function DashboardLayout({
@@ -33,13 +26,50 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-neutral-950">
+    <div className="min-h-screen bg-neutral-950">
+      {/* Mobile Top Bar */}
+      <div className="md:hidden flex items-center justify-between px-6 py-4 border-b border-neutral-800 bg-neutral-900">
+        <button onClick={() => setOpen(true)}>
+          <Menu className="w-6 h-6" />
+        </button>
+
+        <Link href="/" className="font-bold text-lg">
+          Event<span className="text-indigo-500">Gallery</span>
+        </Link>
+      </div>
+
+      {/* Mobile Backdrop */}
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 bg-black/60 z-40 md:hidden"
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 border-r border-neutral-800 bg-neutral-900 p-6 hidden md:flex flex-col">
-        {/* Logo */}
-        <Link href="/" className="text-xl font-bold mb-10">
+      <aside
+        className={`
+          fixed inset-y-0 left-0 z-50 w-64 bg-neutral-900 border-r border-neutral-800 p-6
+          transform transition-transform duration-300
+          ${open ? "translate-x-0" : "-translate-x-full"}
+          md:translate-x-0 md:flex md:flex-col
+        `}
+      >
+        {/* Mobile Close */}
+        <div className="flex items-center justify-between mb-10 md:hidden">
+          <span className="text-xl font-bold">
+            Event<span className="text-indigo-500">Gallery</span>
+          </span>
+          <button onClick={() => setOpen(false)}>
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Desktop Logo */}
+        <Link href="/" className="text-xl font-bold mb-10 hidden md:block">
           Event<span className="text-indigo-500">Gallery</span>
         </Link>
 
@@ -52,6 +82,7 @@ export default function DashboardLayout({
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => setOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                   active
                     ? "bg-indigo-500 text-white"
@@ -73,7 +104,9 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 px-6 py-8">{children}</main>
+      <main className="md:ml-64 px-6 py-8 min-h-screen">
+        {children}
+      </main>
     </div>
   );
 }
