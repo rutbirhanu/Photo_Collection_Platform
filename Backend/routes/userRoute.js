@@ -1,5 +1,5 @@
-import upload from "../middleware/upload.js";
-import { uploadPhoto } from "../controllers/upload.controller.js";
+const upload = require("../middleware/upload.js");
+const {uploadPhoto} = require("../controllers/uploadController.js");
 
 const router = require("express").Router();
 const { register, login } = require("../controllers/auth.controller");

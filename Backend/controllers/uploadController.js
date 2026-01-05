@@ -1,7 +1,7 @@
 // src/controllers/upload.controller.js
-import prisma from "../config/db.js";
+const prisma = require("../config/dbConfig.js");
 
-export const uploadPhotoToAlbum = async (req, res) => {
+exports.uploadPhotoToAlbum = async (req, res) => {
   try {
     const { publicToken } = req.params;
 

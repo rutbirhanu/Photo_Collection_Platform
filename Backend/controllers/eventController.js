@@ -1,9 +1,9 @@
-import prisma from "../config/db.js";
-import QRCode from "qrcode";
-import crypto from "crypto";
-import { PLANS } from "../config/plans.js";
+const prisma = require("../config/dbConfig.js");
+const QRCode = require("qrcode");
+const crypto = require("crypto");
+const {PLANS} = require("../config/plans.js");
 
-export const createEvent = async (req, res) => {
+exports.createEvent = async (req, res) => {
   try {
     const user = req.user;
     const { eventType } = req.body;

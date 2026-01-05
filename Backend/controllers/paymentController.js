@@ -1,9 +1,7 @@
-import stripe from "../config/stripeConfig.js";
-import prisma from "../config/dbConfig.js";
+const stripe = require("../config/stripeConfig.js");
+const prisma = require("../config/dbConfig.js");
 
-const stripe = new Stripe(process.env.STRIPE_SECRET);
-
-export const createCheckout = async (req, res) => {
+exports.createCheckout = async (req, res) => {
   const { plan } = req.body;
 
   const PLANS = {
@@ -35,7 +33,7 @@ export const createCheckout = async (req, res) => {
 
 
 
-export const stripeWebhook = async (req, res) => {
+exports.stripeWebhook = async (req, res) => {
   const sig = req.headers["stripe-signature"];
 
   let event;
@@ -83,42 +81,40 @@ export const stripeWebhook = async (req, res) => {
 
 
 
+// const PLANS = {
+//   FREE: { price: 0, guests: 20, photos: 100 },
+//   BASIC: { price: 2000, guests: 100, photos: 1000 },
+//   PRO: { price: 5000, guests: 500, photos: 10000 },
+// };
 
+// export const createCheckoutSession = async (req, res) => {
+//   const { plan } = req.body;
+//   const user = req.user;
 
-const PLANS = {
-  FREE: { price: 0, guests: 20, photos: 100 },
-  BASIC: { price: 2000, guests: 100, photos: 1000 },
-  PRO: { price: 5000, guests: 500, photos: 10000 },
-};
+//   if (!PLANS[plan]) {
+//     return res.status(400).json({ message: "Invalid plan" });
+//   }
 
-export const createCheckoutSession = async (req, res) => {
-  const { plan } = req.body;
-  const user = req.user;
+//   const selectedPlan = PLANS[plan];
 
-  if (!PLANS[plan]) {
-    return res.status(400).json({ message: "Invalid plan" });
-  }
+//   const session = await stripe.checkout.sessions.create({
+//     payment_method_types: ["card"],
+//     mode: "payment",
+//     client_reference_id: user.id,
+//     metadata: { plan },
+//     line_items: [
+//       {
+//         price_data: {
+//           currency: "usd",
+//           product_data: { name: `${plan} Plan` },
+//           unit_amount: selectedPlan.price,
+//         },
+//         quantity: 1,
+//       },
+//     ],
+//     success_url: `${process.env.FRONTEND_URL}/payment-success`,
+//     cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
+//   });
 
-  const selectedPlan = PLANS[plan];
-
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
-    mode: "payment",
-    client_reference_id: user.id,
-    metadata: { plan },
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          product_data: { name: `${plan} Plan` },
-          unit_amount: selectedPlan.price,
-        },
-        quantity: 1,
-      },
-    ],
-    success_url: `${process.env.FRONTEND_URL}/payment-success`,
-    cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
-  });
-
-  res.json({ url: session.url });
-};
+//   res.json({ url: session.url });
+// };

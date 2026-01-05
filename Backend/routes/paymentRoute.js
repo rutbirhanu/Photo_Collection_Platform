@@ -1,6 +1,5 @@
-import express from "express";
-import { createCheckoutSession, stripeWebhook } from "../controllers/payment.controller.js";
-
+const express = require("express");
+const { createCheckoutSession, stripeWebhook} = require("../controllers/paymentController.js");
 const router = express.Router();
 
 router.post("/checkout", createCheckoutSession);
@@ -10,4 +9,4 @@ router.post(
   stripeWebhook
 );
 
-export default router;
+module.exports = router;
