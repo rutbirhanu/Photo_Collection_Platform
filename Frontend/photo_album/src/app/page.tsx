@@ -1,25 +1,38 @@
 import { QrCode, ImagePlus, Users, ShieldCheck, ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 export default function HomePage() {
   return (
     <main className="bg-background text-foreground">
-      {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 py-32 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
+      <section className="relative min-h-screen overflow-hidden flex items-center justify-center">
+        {/* Background Image */}
+        <Image
+          src="https://img.freepik.com/premium-photo/festive-balloons-confetti-bright-blue-background-perfect-celebrations-parties_386897-19154.jpg"
+          alt="Event celebration background"
+          fill
+          priority
+          className="object-cover"
+        />
+
+        {/* Black Overlay */}
+        <div className="absolute inset-0 bg-black/70" />
+
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-32 text-center">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 text-white">
             Collect Event Photos <br />
-            <span className="text-indigo-500">Without Any App</span>
+            <span className="text-indigo-400">Without Any App</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto mb-10">
+          <p className="text-lg md:text-xl text-neutral-200 max-w-2xl mx-auto mb-10">
             Create an event, generate a QR code, and let guests upload photos
             directly from their phones — instantly and effortlessly.
           </p>
 
           <div className="flex justify-center gap-4">
             <a
-              href="/signup"
-              className="inline-flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 px-8 py-4 rounded-xl font-medium"
+              href="/auth/signup"
+              className="inline-flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 px-8 py-4 rounded-xl font-medium text-white transition"
             >
               Get Started
               <ArrowRight size={18} />
@@ -27,7 +40,7 @@ export default function HomePage() {
 
             <a
               href="/pricing"
-              className="inline-flex items-center gap-2 border border-neutral-700 px-8 py-4 rounded-xl font-medium"
+              className="inline-flex items-center gap-2 border border-white/30 text-white px-8 py-4 rounded-xl font-medium hover:bg-white/10 transition"
             >
               View Pricing
             </a>
@@ -121,7 +134,7 @@ export default function HomePage() {
         </p>
 
         <a
-          href="/signup"
+          href="/auth/signup"
           className="inline-block bg-black text-white px-10 py-4 rounded-xl font-medium"
         >
           Create Your First Event
