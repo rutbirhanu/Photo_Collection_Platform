@@ -34,7 +34,7 @@ export default function DashboardPage() {
         </div>
 
         <a
-          href="/dashboard/event/new"
+          href="event/new-event"
           className="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 px-5 py-3 rounded-lg font-medium transition"
         >
           <Plus className="w-5 h-5" />

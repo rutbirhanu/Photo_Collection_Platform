@@ -14,9 +14,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { label: "Events", href: "/dashboard/event", icon: Calendar },
-  { label: "Albums", href: "/dashboard/album", icon: Images },
-  { label: "Account", href: "/dashboard/account", icon: User },
+  { label: "Events", href: "/event", icon: Calendar },
+  { label: "Albums", href: "/album", icon: Images },
+  { label: "Account", href: "/account", icon: User },
   { label: "Billing", href: "/pricing", icon: CreditCard },
 ];
 
