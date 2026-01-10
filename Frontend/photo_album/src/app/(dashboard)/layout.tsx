@@ -29,11 +29,11 @@ export default function DashboardLayout({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-neutral-950">
+    <div className="min-h-screen bg-neutral-50 text-neutral-900">
       {/* Mobile Top Bar */}
-      <div className="md:hidden flex items-center justify-between px-6 py-4 border-b border-neutral-800 bg-neutral-900">
+      <div className="md:hidden flex items-center justify-between px-6 py-4 border-b border-neutral-200 bg-white">
         <button onClick={() => setOpen(true)}>
-          <Menu className="w-6 h-6" />
+          <Menu className="w-6 h-6 text-neutral-700" />
         </button>
 
         <Link href="/" className="font-bold text-lg">
@@ -45,14 +45,14 @@ export default function DashboardLayout({
       {open && (
         <div
           onClick={() => setOpen(false)}
-          className="fixed inset-0 bg-black/60 z-40 md:hidden"
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
         />
       )}
 
       {/* Sidebar */}
       <aside
         className={`
-          fixed inset-y-0 left-0 z-50 w-64 bg-neutral-900 border-r border-neutral-800 p-6
+          fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-neutral-200 p-6
           transform transition-transform duration-300
           ${open ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0 md:flex md:flex-col
@@ -64,7 +64,7 @@ export default function DashboardLayout({
             Event<span className="text-indigo-500">Gallery</span>
           </span>
           <button onClick={() => setOpen(false)}>
-            <X className="w-6 h-6" />
+            <X className="w-6 h-6 text-neutral-700" />
           </button>
         </div>
 
@@ -86,7 +86,7 @@ export default function DashboardLayout({
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                   active
                     ? "bg-indigo-500 text-white"
-                    : "text-neutral-400 hover:bg-neutral-800 hover:text-white"
+                    : "text-neutral-700 hover:bg-neutral-100"
                 }`}
               >
                 <item.icon className="w-5 h-5" />
@@ -97,14 +97,14 @@ export default function DashboardLayout({
         </nav>
 
         {/* Logout */}
-        <button className="flex items-center gap-3 text-neutral-400 hover:text-white transition mt-6">
+        <button className="flex items-center gap-3 text-neutral-600 hover:text-neutral-900 transition mt-6">
           <LogOut className="w-5 h-5" />
           Logout
         </button>
       </aside>
 
       {/* Main Content */}
-      <main className="md:ml-64 px-6 py-8 min-h-screen">
+      <main className="md:ml-64 px-6 py-8 min-h-screen bg-neutral-50">
         {children}
       </main>
     </div>

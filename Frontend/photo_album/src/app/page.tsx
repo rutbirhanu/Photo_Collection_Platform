@@ -3,7 +3,8 @@ import Image from "next/image";
 
 export default function HomePage() {
   return (
-    <main className="bg-background text-foreground">
+    <main className="bg-white text-neutral-900">
+      {/* HERO */}
       <section className="relative min-h-screen overflow-hidden flex items-center justify-center">
         {/* Background Image */}
         <Image
@@ -14,12 +15,12 @@ export default function HomePage() {
           className="object-cover"
         />
 
-        {/* Black Overlay */}
-        <div className="absolute inset-0 bg-black/70" />
+        {/* Dark Overlay (intentional for contrast) */}
+        <div className="absolute inset-0 bg-black/60" />
 
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 py-32 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 text-white">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
             Collect Event Photos <br />
             <span className="text-indigo-400">Without Any App</span>
           </h1>
@@ -40,7 +41,7 @@ export default function HomePage() {
 
             <a
               href="/pricing"
-              className="inline-flex items-center gap-2 border border-white/30 text-white px-8 py-4 rounded-xl font-medium hover:bg-white/10 transition"
+              className="inline-flex items-center gap-2 border border-white/40 text-white px-8 py-4 rounded-xl font-medium hover:bg-white/10 transition"
             >
               View Pricing
             </a>
@@ -49,7 +50,7 @@ export default function HomePage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="py-28 border-t border-neutral-800">
+      <section className="py-23 border-t border-neutral-200 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-16">
             How It Works
@@ -76,13 +77,13 @@ export default function HomePage() {
       </section>
 
       {/* WHY */}
-      <section className="py-28 bg-neutral-950 border-t border-neutral-800">
+      <section className="py-28 bg-neutral-50 border-t border-neutral-200">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
           <div>
             <h2 className="text-4xl font-bold mb-6">
               Designed for Real Events
             </h2>
-            <p className="text-neutral-400 mb-8">
+            <p className="text-neutral-600 mb-8">
               Stop chasing guests for photos after the event. Everything is
               collected automatically, organized, and ready.
             </p>
@@ -95,12 +96,12 @@ export default function HomePage() {
             </ul>
           </div>
 
-          <div className="rounded-3xl border border-neutral-800 p-10 bg-neutral-900">
+          <div className="rounded-3xl border border-neutral-200 p-10 bg-white shadow-sm">
             <ShieldCheck className="text-indigo-500 mb-4" size={40} />
             <h3 className="text-2xl font-semibold mb-2">
               Privacy First
             </h3>
-            <p className="text-neutral-400">
+            <p className="text-neutral-600">
               Only people with your QR code can upload. You stay in full control
               of every album.
             </p>
@@ -109,7 +110,7 @@ export default function HomePage() {
       </section>
 
       {/* USE CASES */}
-      <section className="py-28 border-t border-neutral-800">
+      <section className="py-28 border-t border-neutral-200 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-16">
             Perfect For
@@ -125,8 +126,8 @@ export default function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-32 bg-indigo-500 text-black text-center">
-        <h2 className="text-4xl font-bold mb-6">
+      <section className="py-20 bg-indigo-500 text-white text-center">
+        <h2 className="text-4xl font-bold mb-4">
           Start Collecting Photos Today
         </h2>
         <p className="text-lg mb-10">
@@ -135,14 +136,14 @@ export default function HomePage() {
 
         <a
           href="/auth/signup"
-          className="inline-block bg-black text-white px-10 py-4 rounded-xl font-medium"
+          className="inline-block bg-white text-indigo-600 px-10 py-4 rounded-xl font-medium hover:bg-neutral-100 transition"
         >
           Create Your First Event
         </a>
       </section>
 
       {/* FOOTER */}
-      <footer className="py-10 text-center text-neutral-500 text-sm">
+      <footer className="py-10 text-center text-neutral-500 text-sm bg-white border-t border-neutral-200">
         © {new Date().getFullYear()} YourBrand. All rights reserved.
       </footer>
     </main>
@@ -154,18 +155,18 @@ export default function HomePage() {
 function Step({ icon, title, desc }) {
   return (
     <div className="text-center">
-      <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-500">
+      <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
         {icon}
       </div>
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-neutral-400">{desc}</p>
+      <p className="text-neutral-600">{desc}</p>
     </div>
   );
 }
 
 function Feature({ text }) {
   return (
-    <li className="flex items-center gap-3">
+    <li className="flex items-center gap-3 text-neutral-700">
       <ShieldCheck size={18} className="text-indigo-500" />
       <span>{text}</span>
     </li>
@@ -174,7 +175,7 @@ function Feature({ text }) {
 
 function UseCase({ title }) {
   return (
-    <div className="border border-neutral-800 rounded-2xl p-6 text-center bg-neutral-900">
+    <div className="border border-neutral-200 rounded-2xl p-6 text-center bg-white shadow-sm">
       <h3 className="font-semibold text-lg">{title}</h3>
     </div>
   );

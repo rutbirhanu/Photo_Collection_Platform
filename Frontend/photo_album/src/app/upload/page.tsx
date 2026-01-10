@@ -23,7 +23,7 @@ export default function UploadPage({
 
   const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-    setFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
+    setFiles((prev) => [...prev, ...Array.from(e.target.files)]);
     setError(null);
   };
 
@@ -65,19 +65,19 @@ export default function UploadPage({
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-neutral-950">
-      <div className="bg-neutral-900 w-full max-w-md p-8 rounded-2xl shadow-xl">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-neutral-50 text-neutral-900">
+      <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg border border-neutral-200">
         <h1 className="text-2xl font-bold text-center mb-2">
           Upload your photos
         </h1>
-        <p className="text-sm text-neutral-400 text-center mb-6">
+        <p className="text-sm text-neutral-500 text-center mb-6">
           Add your memories to this event album
         </p>
 
         {/* File picker */}
-        <label className="flex flex-col items-center justify-center border-2 border-dashed border-neutral-700 rounded-xl p-6 cursor-pointer hover:border-indigo-500 transition">
+        <label className="flex flex-col items-center justify-center border-2 border-dashed border-neutral-300 rounded-xl p-6 cursor-pointer hover:border-indigo-500 transition">
           <ImagePlus className="w-10 h-10 text-neutral-400 mb-2" />
-          <span className="text-sm text-neutral-400 text-center">
+          <span className="text-sm text-neutral-500 text-center">
             Tap to select photos
           </span>
           <input
@@ -98,7 +98,7 @@ export default function UploadPage({
               return (
                 <div
                   key={index}
-                  className="relative group rounded-lg overflow-hidden border border-neutral-800"
+                  className="relative group rounded-lg overflow-hidden border border-neutral-200"
                 >
                   <img
                     src={preview}
@@ -119,7 +119,7 @@ export default function UploadPage({
 
         {/* Error */}
         {error && (
-          <div className="flex items-center gap-2 text-red-400 mt-4">
+          <div className="flex items-center gap-2 text-red-600 mt-4">
             <AlertCircle className="w-5 h-5" />
             <span className="text-sm">{error}</span>
           </div>
@@ -127,7 +127,7 @@ export default function UploadPage({
 
         {/* Success */}
         {success && (
-          <div className="flex items-center gap-2 text-green-400 mt-4">
+          <div className="flex items-center gap-2 text-green-600 mt-4">
             <CheckCircle className="w-5 h-5" />
             <span className="text-sm">Upload successful. Thank you!</span>
           </div>
@@ -137,10 +137,14 @@ export default function UploadPage({
         <button
           onClick={handleUpload}
           disabled={uploading || files.length === 0}
-          className="mt-6 w-full flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 py-3 rounded-lg font-medium transition"
+          className="mt-6 w-full flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 text-white py-3 rounded-lg font-medium transition"
         >
           <UploadCloud className="w-5 h-5" />
-          {uploading ? "Uploading..." : `Upload ${files.length} photo${files.length > 1 ? "s" : ""}`}
+          {uploading
+            ? "Uploading..."
+            : `Upload ${files.length} photo${
+                files.length > 1 ? "s" : ""
+              }`}
         </button>
       </div>
     </div>

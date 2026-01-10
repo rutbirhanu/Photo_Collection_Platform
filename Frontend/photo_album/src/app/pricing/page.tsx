@@ -44,9 +44,11 @@ export default function PricingPage() {
   ];
 
   return (
-    <div className="min-h-screen px-6 py-20">
-      <h1 className="text-4xl font-bold text-center mb-4">Simple, Transparent Pricing</h1>
-      <p className="text-neutral-400 text-center mb-12">
+    <div className="min-h-screen px-6 py-20 bg-neutral-50 text-neutral-900">
+      <h1 className="text-4xl font-bold text-center mb-4">
+        Simple, Transparent Pricing
+      </h1>
+      <p className="text-neutral-600 text-center mb-12">
         Pay once per event. No apps for guests. Just scan & upload.
       </p>
 
@@ -54,17 +56,17 @@ export default function PricingPage() {
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className={`rounded-2xl p-8 border ${
+            className={`rounded-2xl p-8 border bg-white transition ${
               plan.highlighted
                 ? "border-indigo-500 shadow-lg shadow-indigo-500/20"
-                : "border-neutral-800"
+                : "border-neutral-200"
             }`}
           >
             <h2 className="text-2xl font-semibold mb-2">{plan.name}</h2>
-            <p className="text-neutral-400 mb-6">{plan.description}</p>
+            <p className="text-neutral-600 mb-6">{plan.description}</p>
 
             <p className="text-4xl font-bold mb-1">{plan.price}</p>
-            <p className="text-sm text-neutral-400 mb-6">
+            <p className="text-sm text-neutral-500 mb-6">
               {plan.photos} photos per event
             </p>
 
@@ -72,7 +74,7 @@ export default function PricingPage() {
               {plan.features.map((feature) => (
                 <li key={feature} className="flex items-center gap-3">
                   <Check className="w-5 h-5 text-indigo-500" />
-                  <span>{feature}</span>
+                  <span className="text-neutral-700">{feature}</span>
                 </li>
               ))}
             </ul>
@@ -80,8 +82,8 @@ export default function PricingPage() {
             <button
               className={`w-full py-3 rounded-lg font-medium transition ${
                 plan.highlighted
-                  ? "bg-indigo-500 hover:bg-indigo-600"
-                  : "bg-neutral-800 hover:bg-neutral-700"
+                  ? "bg-indigo-500 hover:bg-indigo-600 text-white"
+                  : "bg-neutral-100 hover:bg-neutral-200 text-neutral-900"
               }`}
             >
               Choose {plan.name}

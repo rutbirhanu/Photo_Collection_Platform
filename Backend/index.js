@@ -5,7 +5,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// app.use("/api/auth", require("./routes/auth.routes"));
+app.use("/api", require("./routes/userRoute"));
 app.use("/api/payments", require("./routes/paymentRoute"));
 // app.use("/api/events", require("./routes/eventRoute"));
 app.use("/api/albums", require("./routes/albumRoute"));
