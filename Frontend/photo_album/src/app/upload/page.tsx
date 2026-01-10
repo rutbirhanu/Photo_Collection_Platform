@@ -107,7 +107,7 @@ export default function UploadPage({
                   />
                   <button
                     onClick={() => removeFile(index)}
-                    className="absolute top-1 right-1 bg-black/60 rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                    className="absolute top-1 right-1 bg-black/60 rounded-full p-1 opacity-100 group-hover:opacity-50 transition"
                   >
                     <X className="w-4 h-4 text-white" />
                   </button>
@@ -142,9 +142,8 @@ export default function UploadPage({
           <UploadCloud className="w-5 h-5" />
           {uploading
             ? "Uploading..."
-            : `Upload ${files.length} photo${
-                files.length > 1 ? "s" : ""
-              }`}
+            : `Upload ${files.length} photo${files.length > 1 ? "s" : ""
+            }`}
         </button>
       </div>
     </div>
