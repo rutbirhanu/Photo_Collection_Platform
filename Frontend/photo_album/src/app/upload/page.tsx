@@ -1,151 +1,18 @@
-"use client";
+"use client"; // needed if you use client-side hooks
 
-import { useState } from "react";
-import {
-  ImagePlus,
-  UploadCloud,
-  CheckCircle,
-  AlertCircle,
-  X,
-} from "lucide-react";
+import { useParams } from "next/navigation";
 
-export default function UploadPage({
-  params,
-}: {
-  params: { publicToken: string };
-}) {
-  const { publicToken } = params;
-
-  const [files, setFiles] = useState<File[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    setFiles((prev) => [...prev, ...Array.from(e.target.files)]);
-    setError(null);
-  };
-
-  const removeFile = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleUpload = async () => {
-    if (!files.length) return;
-
-    setUploading(true);
-    setError(null);
-
-    const formData = new FormData();
-    files.forEach((file) => formData.append("photos", file));
-
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/albums/${publicToken}/upload`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Upload failed");
-      }
-
-      setSuccess(true);
-      setFiles([]);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setUploading(false);
-    }
-  };
+export default function UploadPage() {
+  const params = useParams();
+  const eventId = params.eventId;
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-neutral-50 text-neutral-900">
-      <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg border border-neutral-200">
-        <h1 className="text-2xl font-bold text-center mb-2">
-          Upload your photos
-        </h1>
-        <p className="text-sm text-neutral-500 text-center mb-6">
-          Add your memories to this event album
-        </p>
+    <div>
+      <h1>Upload Photos</h1>
+      <p>Event ID: {eventId}</p>
+          {/* Add your upload form here */}
+          <img src={"data:image/png;base64,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"} alt="QR Code" />
 
-        {/* File picker */}
-        <label className="flex flex-col items-center justify-center border-2 border-dashed border-neutral-300 rounded-xl p-6 cursor-pointer hover:border-indigo-500 transition">
-          <ImagePlus className="w-10 h-10 text-neutral-400 mb-2" />
-          <span className="text-sm text-neutral-500 text-center">
-            Tap to select photos
-          </span>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            hidden
-            onChange={handleSelect}
-          />
-        </label>
-
-        {/* Preview Grid */}
-        {files.length > 0 && (
-          <div className="mt-4 grid grid-cols-4 gap-3 max-h-40 overflow-y-auto">
-            {files.map((file, index) => {
-              const preview = URL.createObjectURL(file);
-
-              return (
-                <div
-                  key={index}
-                  className="relative group rounded-lg overflow-hidden border border-neutral-200"
-                >
-                  <img
-                    src={preview}
-                    alt="preview"
-                    className="w-full h-20 object-cover"
-                  />
-                  <button
-                    onClick={() => removeFile(index)}
-                    className="absolute top-1 right-1 bg-black/60 rounded-full p-1 opacity-100 group-hover:opacity-50 transition"
-                  >
-                    <X className="w-4 h-4 text-white" />
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Error */}
-        {error && (
-          <div className="flex items-center gap-2 text-red-600 mt-4">
-            <AlertCircle className="w-5 h-5" />
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
-
-        {/* Success */}
-        {success && (
-          <div className="flex items-center gap-2 text-green-600 mt-4">
-            <CheckCircle className="w-5 h-5" />
-            <span className="text-sm">Upload successful. Thank you!</span>
-          </div>
-        )}
-
-        {/* Upload button */}
-        <button
-          onClick={handleUpload}
-          disabled={uploading || files.length === 0}
-          className="mt-6 w-full flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 text-white py-3 rounded-lg font-medium transition"
-        >
-          <UploadCloud className="w-5 h-5" />
-          {uploading
-            ? "Uploading..."
-            : `Upload ${files.length} photo${files.length > 1 ? "s" : ""
-            }`}
-        </button>
-      </div>
     </div>
   );
 }

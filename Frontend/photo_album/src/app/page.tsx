@@ -1,7 +1,18 @@
 import { QrCode, ImagePlus, Users, ShieldCheck, ArrowRight } from "lucide-react";
 import Image from "next/image";
 
+
 export default function HomePage() {
+
+  const images = [
+    "/festival.jpg",
+    "/birthday.jpg",
+    "/wedding.jpg",
+    "/graduation.jpg",
+    "/wedding.jpg",
+
+  ];
+
   return (
     <main className="bg-white text-neutral-900">
       {/* HERO */}
@@ -76,6 +87,7 @@ export default function HomePage() {
         </div>
       </section>
 
+
       {/* WHY */}
       <section className="py-28 bg-neutral-50 border-t border-neutral-200">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
@@ -110,20 +122,61 @@ export default function HomePage() {
       </section>
 
       {/* USE CASES */}
-      <section className="py-28 border-t border-neutral-200 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-4xl font-bold text-center mb-16">
-            Perfect For
-          </h2>
-
-          <div className="grid md:grid-cols-4 gap-8">
-            <UseCase title="Weddings" />
-            <UseCase title="Birthdays" />
-            <UseCase title="Corporate Events" />
-            <UseCase title="Festivals" />
+      <h2 className="text-4xl pt-20 font-bold text-center mb-16">
+        Perfect For
+      </h2>
+      <div className="flex flex-row  items-start justify-center">
+        <section className="pb-50 bg-white">
+          <div className="mx-auto px-6">
+            <div className="grid md:grid-cols-2 gap-8">
+              <UseCase title="Weddings" />
+              <UseCase title="Birthdays" />
+              <UseCase title="Corporate Events" />
+              <UseCase title="Festivals" />
+            </div>
           </div>
+        </section>
+
+        <div
+          className="card-deck"
+          style={{
+            position: "relative",
+            height: "220px",
+            width: "400px",
+            margin: "0 auto",
+          }}
+        >
+          {images.map((src, i) => {
+            const middle = (images.length - 1) / 2;
+            const rotate = (i - middle) * 30;     // rotation angle
+            const offsetX = (i - middle) * 25;    // horizontal spread
+
+            return (
+              <Image
+                key={i}
+                src={src}
+                alt={`card-${i}`}
+                width={160}
+                height={200}
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: "50%",
+                  transform: `
+            translateX(calc(-50% + ${offsetX}px))
+            rotate(${rotate}deg)
+          `,
+                  transformOrigin: "bottom center",
+                  zIndex: i,
+                  borderRadius: "8px",
+                  boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
+                }}
+              />
+            );
+          })}
         </div>
-      </section>
+
+      </div>
 
       {/* CTA */}
       <section className="py-20 bg-indigo-500 text-white text-center">

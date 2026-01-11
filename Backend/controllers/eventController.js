@@ -1,17 +1,23 @@
 const prisma = require("../config/dbConfig.js");
 const QRCode = require("qrcode");
 const crypto = require("crypto");
-const {PLANS} = require("../config/plans.js");
+// const { PLANS } = require("../config/plans.js");
+const PLANS = {
+    FREE: { price: 0, guests: 20, photos: 100 },
+    BASIC: { price: 2000, guests: 100, photos: 1000 },
+    PRO: { price: 5000, guests: 500, photos: 10000 }
+  };
 
 exports.createEvent = async (req, res) => {
   try {
     const user = req.user;
     const { eventType } = req.body;
+    console.log(user)
 
     // 1️⃣ Payment gate
-    if (!user.isPaid) {
-      return res.status(403).json({ message: "Payment required" });
-    }
+    // if (!user.isPaid) {
+    //   return res.status(403).json({ message: "Payment required" });
+    // }
 
     // 2️⃣ Create Event
     const event = await prisma.event.create({
@@ -25,7 +31,8 @@ exports.createEvent = async (req, res) => {
     const publicToken = crypto.randomUUID();
 
     // 4️⃣ Determine upload limit from plan
-    const uploadLimit = PLANS[user.plan].uploadLimit;
+    console.log("User Plan:", user.plan);
+    const uploadLimit =10;
 
     // 5️⃣ Create Album
     const album = await prisma.album.create({
