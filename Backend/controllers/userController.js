@@ -79,6 +79,49 @@ exports.login = async (req, res) => {
 };
 
 
+exports.getCurrentUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        plan: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error("Fetch current user error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+exports.logout = (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: false, // true in production (HTTPS)
+    });
+
+    res.json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({ message: "Logout failed" });
+  }
+};
+
+
 // exports.googleLogin = async (req, res) => {
 //   const { idToken } = req.body; // frontend sends Google ID token
 
