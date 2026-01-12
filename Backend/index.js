@@ -7,10 +7,10 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api", require("./routes/userRoute"));
-app.use("/api/payments", require("./routes/paymentRoute"));
-app.use("/api", require("./routes/eventRoute"));
-app.use("/api/albums", require("./routes/albumRoute"));
+app.use("/auth", require("./routes/userRoute"));
+app.use("/payments", require("./routes/paymentRoute"));
+app.use("/event", require("./routes/eventRoute"));
+app.use("/albums", require("./routes/albumRoute"));
 // app.use("/api/upload", require("./routes/upload.routes"));
 
 app.listen(5000, () => {

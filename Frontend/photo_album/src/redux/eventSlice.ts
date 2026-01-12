@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 export const fetchEvents = createAsyncThunk(
   "events/fetch",
   async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event/`, {
       credentials: "include",
     });
 
@@ -17,11 +17,30 @@ export const fetchEvents = createAsyncThunk(
   }
 );
 
+export const fetchEventById = createAsyncThunk(
+  "events/fetchById",
+  async (eventId, { rejectWithValue }) => {
+    try {
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event/${eventId}`, {
+             credentials: "include",
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
 // Create a new event
 export const createEvent = createAsyncThunk(
   "events/create",
   async (data: { name: string }) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event/create-event`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -39,37 +58,117 @@ export const createEvent = createAsyncThunk(
   }
 );
 
-interface EventState {
-  list: any[];
-  loading: boolean;
-}
 
-const initialState: EventState = {
-  list: [],
-  loading: false,
-};
+export const updateEvent = createAsyncThunk(
+  "events/update",
+  async ({ eventId, payload }, { rejectWithValue }) => {
+    try {
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event/${eventId}`, {
+        method: "PUT",
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+
+export const deleteEvent = createAsyncThunk(
+  "events/delete",
+  async (eventId, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event/${eventId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message);
+      }
+
+      return eventId;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+
 
 const eventSlice = createSlice({
   name: "events",
-  initialState,
-  reducers: {},
+  initialState: {
+    events: [],
+    currentEvent: null,
+    loading: false,
+    error: null,
+  },
+  reducers: {
+    clearCurrentEvent(state) {
+      state.currentEvent = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
+      // CREATE
+      .addCase(createEvent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createEvent.fulfilled, (state, action) => {
+        state.loading = false;
+        state.events.unshift(action.payload.event);
+      })
+      .addCase(createEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // FETCH ALL
       .addCase(fetchEvents.pending, (state) => {
         state.loading = true;
       })
       .addCase(fetchEvents.fulfilled, (state, action) => {
         state.loading = false;
-        state.list = action.payload;
+        state.events = action.payload;
       })
-      .addCase(fetchEvents.rejected, (state) => {
+      .addCase(fetchEvents.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload;
       })
-      .addCase(createEvent.fulfilled, (state, action) => {
-        state.list.unshift(action.payload);
+
+      // FETCH ONE
+      .addCase(fetchEventById.fulfilled, (state, action) => {
+        state.currentEvent = action.payload;
       })
-      .addCase(createEvent.rejected, (state) => {
-        // Optionally handle create failure
+
+      // UPDATE
+      .addCase(updateEvent.fulfilled, (state, action) => {
+        const index = state.events.findIndex(
+          (e) => e.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.events[index] = action.payload;
+        }
+        state.currentEvent = action.payload;
+      })
+
+      // DELETE
+      .addCase(deleteEvent.fulfilled, (state, action) => {
+        state.events = state.events.filter(
+          (e) => e.id !== action.payload
+        );
       });
   },
 });

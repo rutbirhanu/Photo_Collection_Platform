@@ -1,7 +1,6 @@
 const prisma = require("../config/dbConfig.js");
 const QRCode = require("qrcode");
 const crypto = require("crypto");
-// const { PLANS } = require("../config/plans.js");
 const PLANS = {
     FREE: { price: 0, guests: 20, photos: 100 },
     BASIC: { price: 2000, guests: 100, photos: 1000 },
@@ -57,5 +56,113 @@ exports.createEvent = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to create event" });
+  }
+};
+
+exports.getMyEvents = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const events = await prisma.event.findMany({
+      where: { userId },
+      include: {
+        album: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.json(events);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch events" });
+  }
+};
+
+
+exports.getEventById = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const userId = req.user.id;
+
+    const event = await prisma.event.findFirst({
+      where: {
+        id: eventId,
+        userId,
+      },
+      include: {
+        album: true,
+      },
+    });
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    res.json(event);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch event" });
+  }
+};
+
+
+exports.updateEvent = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const userId = req.user.id;
+    const { eventType } = req.body;
+
+    // Ensure ownership
+    const event = await prisma.event.findFirst({
+      where: { id: eventId, userId },
+    });
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    const updatedEvent = await prisma.event.update({
+      where: { id: eventId },
+      data: {
+        eventType,
+      },
+    });
+
+    res.json(updatedEvent);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to update event" });
+  }
+};
+
+
+exports.deleteEvent = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const userId = req.user.id;
+
+    // Ensure ownership
+    const event = await prisma.event.findFirst({
+      where: { id: eventId, userId },
+    });
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    // Delete related albums
+    await prisma.album.deleteMany({
+      where: { eventId },
+    });
+
+    // Delete event
+    await prisma.event.delete({
+      where: { id: eventId },
+    });
+
+    res.json({ message: "Event deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to delete event" });
   }
 };

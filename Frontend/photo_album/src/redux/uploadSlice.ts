@@ -3,21 +3,21 @@ import { createSlice } from "@reduxjs/toolkit";
 const uploadSlice = createSlice({
   name: "uploads",
   initialState: {
-    progress: 0,
+    // progress: 0,
     uploading: false,
     error: null,
   },
   reducers: {
     startUpload(state) {
       state.uploading = true;
-      state.progress = 0;
+      // state.progress = 0;
     },
-    setProgress(state, action) {
-      state.progress = action.payload;
-    },
+    // setProgress(state, action) {
+    //   state.progress = action.payload;
+    // },
     uploadSuccess(state) {
       state.uploading = false;
-      state.progress = 100;
+      // state.progress = 100;
     },
     uploadFail(state, action) {
       state.uploading = false;
