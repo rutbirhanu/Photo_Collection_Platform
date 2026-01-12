@@ -8,9 +8,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/auth", require("./routes/userRoute"));
-app.use("/payments", require("./routes/paymentRoute"));
+app.use("/payment", require("./routes/paymentRoute"));
 app.use("/event", require("./routes/eventRoute"));
-app.use("/albums", require("./routes/albumRoute"));
+app.use("/album", require("./routes/albumRoute"));
 // app.use("/api/upload", require("./routes/upload.routes"));
 
 app.listen(5000, () => {

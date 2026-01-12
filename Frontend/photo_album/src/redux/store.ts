@@ -1,10 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit'
 import authSlice from './authSlice'
+import uploadSlice from './uploadSlice'
+import eventSlice from './eventSlice'
+import albumSlice from './albumSlice'
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
-      auth: authSlice
+      auth: authSlice,
+      event: eventSlice,
+      album: albumSlice,
+      upload: uploadSlice
     }
   })
 }
