@@ -46,7 +46,6 @@ exports.register = async (req, res) => {
         createdAt: true,
       },
     });
-
     // 5. Return safe response
     return res.status(201).json({
       message: "User registered successfully",
@@ -69,7 +68,7 @@ exports.login = async (req, res) => {
     return res.status(401).json({ message: "Invalid credentials" });
 
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
-   res.cookie("token", token, {
+  res.cookie("token", token, {
     httpOnly: true,
     secure: false,
     sameSite: "strict",

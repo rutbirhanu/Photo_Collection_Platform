@@ -1,5 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+interface eventData{
+  title: string;
+  description: string;
+  date: string;
+}
+
+
 // Fetch all events
 export const fetchEvents = createAsyncThunk(
   "events/fetch",
@@ -39,7 +46,7 @@ export const fetchEventById = createAsyncThunk(
 // Create a new event
 export const createEvent = createAsyncThunk(
   "events/create",
-  async (data: { name: string }) => {
+  async (data:eventData , {rejectWithValue}) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event/create-event`, {
       method: "POST",
       credentials: "include",
@@ -54,6 +61,7 @@ export const createEvent = createAsyncThunk(
     }
 
     const result = await res.json();
+    console.log("Create Event Result:", result);
     return result;
   }
 );
@@ -113,6 +121,7 @@ const eventSlice = createSlice({
     currentEvent: null,
     loading: false,
     error: null,
+    success: false,
   },
   reducers: {
     clearCurrentEvent(state) {
@@ -128,11 +137,12 @@ const eventSlice = createSlice({
       })
       .addCase(createEvent.fulfilled, (state, action) => {
         state.loading = false;
+        state.success = true;
         state.events.unshift(action.payload.event);
       })
       .addCase(createEvent.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Something went wrong";
       })
 
       // FETCH ALL

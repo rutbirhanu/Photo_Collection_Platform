@@ -1,8 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+
+interface signupPayload{
+  name: string,
+  email: string,
+  password: string
+}
+
+interface loginPayload{
+  email: string,
+  password: string
+} 
+
 export const register = createAsyncThunk(
   "auth/register",
-  async (payload, { rejectWithValue }) => {
+  async (payload: signupPayload, { rejectWithValue }) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
         method: "POST",
@@ -13,6 +25,7 @@ export const register = createAsyncThunk(
       });
 
       const data = await res.json();
+      console.log(data);
       if (!res.ok) throw new Error(data.message);
 
       return data.user;
@@ -25,18 +38,19 @@ export const register = createAsyncThunk(
 
 export const login = createAsyncThunk(
   "auth/login",
-  async (payload, { rejectWithValue }) => {
+  async (payload: loginPayload, { rejectWithValue }) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", 
+        // credentials: "include", 
         body: JSON.stringify(payload),
       });
 
       const data = await res.json();
+      console.log(data);
       if (!res.ok) throw new Error(data.message);
 
       return data;
@@ -152,5 +166,5 @@ const authSlice = createSlice({
 });
 
 
-export const { logout } = authSlice.actions;
+export const { clearAuthError } = authSlice.actions;
 export default authSlice.reducer;

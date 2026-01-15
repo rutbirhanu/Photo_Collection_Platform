@@ -1,7 +1,7 @@
 // src/routes/upload.routes.js
 const express = require("express");
 const verifyToken = require("../middleware/auth.js");
-const { createAlbum, getMyAlbums, getAlbumById, updateAlbum, deleteAlbum } = require("../controllers/albumController.js");
+const { createAlbum, getMyAlbums, getAlbumById, updateAlbum, deleteAlbum, getAlbumByPublicToken } = require("../controllers/albumController.js");
 
 const router = express.Router();
 
