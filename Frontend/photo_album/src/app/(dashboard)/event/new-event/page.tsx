@@ -15,7 +15,7 @@ export default function CreateEventPage() {
   );
 
   const [form, setForm] = useState({
-    title: "",
+    eventType: "",
     description: "",
     date: "",
   });
@@ -63,9 +63,9 @@ export default function CreateEventPage() {
             Event Name
           </label>
           <input
-            name="title"
+            name="eventType"
             required
-            value={form.title}
+            value={form.eventType}
             onChange={handleChange}
             placeholder="Wedding of Alex & Maria"
             className="w-full p-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"

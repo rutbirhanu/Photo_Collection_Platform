@@ -45,7 +45,7 @@ model Payment {
 
 model Event {
   id        String   @id @default(cuid())
-  eventType      String
+  eventType    String
 
   userId    String
   user      User     @relation(fields: [userId], references: [id])

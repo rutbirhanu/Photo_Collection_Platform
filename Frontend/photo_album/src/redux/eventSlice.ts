@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 interface eventData{
-  title: string;
+  eventType: string;
   description: string;
   date: string;
 }
