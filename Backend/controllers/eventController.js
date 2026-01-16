@@ -2,10 +2,10 @@ const prisma = require("../config/dbConfig.js");
 const QRCode = require("qrcode");
 const crypto = require("crypto");
 const PLANS = {
-    FREE: { price: 0, guests: 20, photos: 100 },
-    BASIC: { price: 2000, guests: 100, photos: 1000 },
-    PRO: { price: 5000, guests: 500, photos: 10000 }
-  };
+  FREE: { price: 0, guests: 20, photos: 100 },
+  BASIC: { price: 2000, guests: 100, photos: 1000 },
+  PRO: { price: 5000, guests: 500, photos: 10000 }
+};
 
 exports.createEvent = async (req, res) => {
   try {
@@ -31,7 +31,7 @@ exports.createEvent = async (req, res) => {
 
     // 4️⃣ Determine upload limit from plan
     console.log("User Plan:", user.plan);
-    const uploadLimit =10;
+    const uploadLimit = 10;
 
     // 5️⃣ Create Album
     const album = await prisma.album.create({
@@ -45,7 +45,7 @@ exports.createEvent = async (req, res) => {
     // 6️⃣ Generate QR for album
     const uploadUrl = `${process.env.FRONTEND_URL}/upload/${publicToken}`;
     const qrCodeBase64 = await QRCode.toDataURL(uploadUrl);
-    
+
     // 7️⃣ Return everything frontend needs
     res.status(201).json({
       event,
@@ -66,11 +66,11 @@ exports.getMyEvents = async (req, res) => {
     const events = await prisma.event.findMany({
       where: { userId },
       include: {
-        album: true,
+        albums: true,
       },
       orderBy: { createdAt: "desc" },
     });
-
+    console.log("Retrieved Events:", events);
     res.json(events);
   } catch (error) {
     console.error(error);

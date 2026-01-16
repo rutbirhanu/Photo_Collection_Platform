@@ -8,6 +8,7 @@ const verifyToken = (req, res, next) => {
         if (!token) {
             return res.status(401).json("unauthorized")
         }
+        console.log("Token from cookie:", token);
         const decodedJwt = jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             if (err) {
                 return res.status(401).json("unauthorized")

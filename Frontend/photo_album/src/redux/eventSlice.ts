@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-interface eventData{
+interface eventData {
   eventType: string;
   description: string;
   date: string;
@@ -11,8 +11,12 @@ interface eventData{
 export const fetchEvents = createAsyncThunk(
   "events/fetch",
   async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event/`, {
+    const res = await fetch(`http://localhost:5000/event`, {
+      method: "GET",
       credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     if (!res.ok) {
@@ -20,6 +24,7 @@ export const fetchEvents = createAsyncThunk(
     }
 
     const data = await res.json();
+    console.log("Fetched Events:", data);
     return data;
   }
 );
@@ -30,7 +35,7 @@ export const fetchEventById = createAsyncThunk(
     try {
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event/${eventId}`, {
-             credentials: "include",
+        credentials: "include",
       });
 
       const data = await res.json();
@@ -46,7 +51,7 @@ export const fetchEventById = createAsyncThunk(
 // Create a new event
 export const createEvent = createAsyncThunk(
   "events/create",
-  async (data:eventData , {rejectWithValue}) => {
+  async (data: eventData, { rejectWithValue }) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event/create-event`, {
       method: "POST",
       credentials: "include",

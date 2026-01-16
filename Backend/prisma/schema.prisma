@@ -2,6 +2,7 @@ generator client {
   provider = "prisma-client-js"
   output   = "./generated/prisma"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -14,70 +15,70 @@ enum PaymentStatus {
 }
 
 model User {
-  id           String   @id @default(cuid())
+  id           String @id @default(cuid())
   name         String
-  email        String   @unique
+  email        String @unique
   passwordHash String
 
-  isPaid       Boolean  @default(false)
-  plan         String
+  isPaid Boolean @default(false)
+  plan   String
 
-  events       Event[]
-  payment      Payment?
+  events  Event[]
+  payment Payment?
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Payment {
-  id              String        @id @default(cuid())
-  userId          String        @unique
-  user            User          @relation(fields: [userId], references: [id])
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
 
   stripeSessionId String        @unique
   amount          Int
   currency        String        @default("USD")
   status          PaymentStatus
 
-  paidAt          DateTime?
-  createdAt       DateTime @default(now())
+  paidAt    DateTime?
+  createdAt DateTime  @default(now())
 }
 
 model Event {
-  id        String   @id @default(cuid())
-  eventType    String
+  id        String @id @default(cuid())
+  eventType String
 
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
-  albums    Album[]
+  albums     Album[]
   createdAt DateTime @default(now())
 }
 
 model Album {
-  id          String   @id @default(cuid())
-  eventId     String
-  event       Event    @relation(fields: [eventId], references: [id])
+  id      String @id @default(cuid())
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id])
 
-  publicToken String   @unique
+  publicToken String @unique
   uploadLimit Int
-  uploadsUsed Int      @default(0)
+  uploadsUsed Int    @default(0)
 
-  expiresAt   DateTime?
-  photos      Photo[]
+  expiresAt DateTime?
+  photos    Photo[]
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([publicToken])
 }
 
 model Photo {
-  id           String   @id @default(cuid())
-  albumId      String
-  album        Album    @relation(fields: [albumId], references: [id])
+  id      String @id @default(cuid())
+  albumId String
+  album   Album  @relation(fields: [albumId], references: [id])
 
   cloudinaryId String
   secureUrl    String
 
-  uploadedAt   DateTime @default(now())
+  uploadedAt DateTime @default(now())
 }
