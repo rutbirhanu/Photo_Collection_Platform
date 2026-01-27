@@ -4,22 +4,24 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const uploadPhoto = createAsyncThunk(
   "photo/upload",
-  async ({ file, publicToken }, { rejectWithValue }) => {
+  async ({ files, albumId }:{ files: File[]; albumId: string }, { rejectWithValue }) => {
     try {
       const formData = new FormData();
-      formData.append("photo", file);
+      files.forEach((file) => formData.append("photos", file));
 
-      const res = await fetch(`${API_URL}/upload/${publicToken}`, {
+      const res = await fetch(`${API_URL}/upload/${albumId}`, {
         method: "POST",
         body: formData,
     
       });
 
       const data = await res.json();
+      console.log(data)
       if (!res.ok) throw new Error(data.message);
 
       return data;
     } catch (err) {
+      console.log(err)
       return rejectWithValue(err.message);
     }
   }

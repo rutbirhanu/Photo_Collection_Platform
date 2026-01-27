@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ImagePlus,
   UploadCloud,
@@ -8,23 +8,27 @@ import {
   AlertCircle,
   X,
 } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { uploadPhoto, clearPhotoError } from "@/redux/uploadSlice";
 
 export default function UploadPage({
   params,
 }: {
-  params: { publicToken: string };
+  params: { albumId: string };
 }) {
-  const { publicToken } = params;
+  const { albumId } = params;
+  const dispatch = useAppDispatch();
+
+  const { loading, error } = useAppSelector((state) => state.upload);
 
   const [files, setFiles] = useState<File[]>([]);
-  const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     setFiles((prev) => [...prev, ...Array.from(e.target.files)]);
-    setError(null);
+    setSuccess(false);
+    dispatch(clearPhotoError());
   };
 
   const removeFile = (index: number) => {
@@ -34,39 +38,19 @@ export default function UploadPage({
   const handleUpload = async () => {
     if (!files.length) return;
 
-    setUploading(true);
-    setError(null);
+    const result = await dispatch(
+      uploadPhoto({ files, albumId })
+    );
 
-    const formData = new FormData();
-    files.forEach((file) => formData.append("photos", file));
-
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/albums/${publicToken}/upload`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Upload failed");
-      }
-
+    if (uploadPhoto.fulfilled.match(result)) {
       setSuccess(true);
       setFiles([]);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setUploading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-neutral-50 text-neutral-900">
-      <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg border border-neutral-200">
+      <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg border">
         <h1 className="text-2xl font-bold text-center mb-2">
           Upload your photos
         </h1>
@@ -75,9 +59,9 @@ export default function UploadPage({
         </p>
 
         {/* File picker */}
-        <label className="flex flex-col items-center justify-center border-2 border-dashed border-neutral-300 rounded-xl p-6 cursor-pointer hover:border-indigo-500 transition">
+        <label className="flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-6 cursor-pointer hover:border-indigo-500 transition">
           <ImagePlus className="w-10 h-10 text-neutral-400 mb-2" />
-          <span className="text-sm text-neutral-500 text-center">
+          <span className="text-sm text-neutral-500">
             Tap to select photos
           </span>
           <input
@@ -89,16 +73,15 @@ export default function UploadPage({
           />
         </label>
 
-        {/* Preview Grid */}
+        {/* Preview */}
         {files.length > 0 && (
           <div className="mt-4 grid grid-cols-4 gap-3 max-h-40 overflow-y-auto">
             {files.map((file, index) => {
               const preview = URL.createObjectURL(file);
-
               return (
                 <div
                   key={index}
-                  className="relative group rounded-lg overflow-hidden border border-neutral-200"
+                  className="relative rounded-lg overflow-hidden border"
                 >
                   <img
                     src={preview}
@@ -107,7 +90,7 @@ export default function UploadPage({
                   />
                   <button
                     onClick={() => removeFile(index)}
-                    className="absolute top-1 right-1 bg-black/60 rounded-full p-1 opacity-100 group-hover:opacity-50 transition"
+                    className="absolute top-1 right-1 bg-black/60 p-1 rounded-full"
                   >
                     <X className="w-4 h-4 text-white" />
                   </button>
@@ -129,21 +112,24 @@ export default function UploadPage({
         {success && (
           <div className="flex items-center gap-2 text-green-600 mt-4">
             <CheckCircle className="w-5 h-5" />
-            <span className="text-sm">Upload successful. Thank you!</span>
+            <span className="text-sm">
+              Upload successful. Thank you!
+            </span>
           </div>
         )}
 
         {/* Upload button */}
         <button
           onClick={handleUpload}
-          disabled={uploading || files.length === 0}
-          className="mt-6 w-full flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 text-white py-3 rounded-lg font-medium transition"
+          disabled={loading || files.length === 0}
+          className="mt-6 w-full flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 text-white py-3 rounded-lg font-medium"
         >
           <UploadCloud className="w-5 h-5" />
-          {uploading
+          {loading
             ? "Uploading..."
-            : `Upload ${files.length} photo${files.length > 1 ? "s" : ""
-            }`}
+            : `Upload ${files.length} photo${
+                files.length > 1 ? "s" : ""
+              }`}
         </button>
       </div>
     </div>

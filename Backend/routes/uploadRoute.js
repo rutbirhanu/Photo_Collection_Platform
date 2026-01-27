@@ -4,8 +4,8 @@ const {uploadPhoto} = require("../controllers/uploadController");
 
 // PUBLIC upload via QR
 router.post(
-  "/:publicToken",
-  upload.single("photo"),
+  "/:albumId",
+ upload.array("photos", 50),
   uploadPhoto
 );
 

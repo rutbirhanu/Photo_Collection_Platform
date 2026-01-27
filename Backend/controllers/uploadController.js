@@ -1,69 +1,78 @@
 const prisma = require("../config/dbConfig.js");
 const cloudinary = require("../config/cloudinaryConfig.js");
 
+
 exports.uploadPhoto = async (req, res) => {
   try {
-    const { publicToken } = req.params;
+    const { albumId } = req.params;
 
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "No files uploaded" });
     }
 
-    // 1️⃣ Find album via public token
+    // 1️⃣ Find album
     const album = await prisma.album.findUnique({
-      where: { publicToken },
+      where: { albumId },
     });
 
     if (!album) {
       return res.status(404).json({ message: "Album not found" });
     }
 
-    // 2️⃣ Check expiration
+    // 2️⃣ Expiration check
     if (album.expiresAt && album.expiresAt < new Date()) {
       return res.status(403).json({ message: "Album expired" });
     }
 
-    // 3️⃣ Check upload limit
-    if (album.uploadsUsed >= album.uploadLimit) {
-      return res.status(403).json({ message: "Upload limit reached" });
+    // 3️⃣ Upload limit check (optional)
+    if (
+      album.uploadLimit !== null &&
+      album.uploadsUsed + req.files.length > album.uploadLimit
+    ) {
+      return res.status(403).json({ message: "Upload limit exceeded" });
     }
 
-    // 4️⃣ Upload to Cloudinary
-    const uploadResult = await new Promise((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          {
-            folder: `albums/${album.id}`,
-            resource_type: "image",
-          },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        )
-        .end(req.file.buffer);
-    });
+    // 4️⃣ Upload ALL images
+    const uploadedPhotos = [];
 
-    // 5️⃣ Save photo record
-    const photo = await prisma.photo.create({
-      data: {
-        albumId: album.id,
-        cloudinaryId: uploadResult.public_id,
-        secureUrl: uploadResult.secure_url,
-      },
-    });
+    for (const file of req.files) {
+      const uploadResult = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            {
+              folder: `albums/${albumId}`,
+              resource_type: "image",
+            },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          )
+          .end(file.buffer);
+      });
 
-    // 6️⃣ Increment uploadsUsed (atomic)
+      const photo = await prisma.photo.create({
+        data: {
+          albumId: album.id,
+          cloudinaryId: uploadResult.public_id,
+          secureUrl: uploadResult.secure_url,
+        },
+      });
+
+      uploadedPhotos.push(photo);
+    }
+
+    // 5️⃣ Increment uploadsUsed by COUNT
     await prisma.album.update({
       where: { id: album.id },
       data: {
-        uploadsUsed: { increment: 1 },
+        uploadsUsed: { increment: req.files.length },
       },
     });
-
-    res.status(201).json(photo);
+console.log("Uploaded photos:", uploadedPhotos);
+    res.status(201).json(uploadedPhotos);
   } catch (error) {
-    console.error("Upload photo error:", error);
-    res.status(500).json({ message: "Failed to upload photo" });
+    console.error("Upload photos error:", error);
+    res.status(500).json({ message: "Failed to upload photos" });
   }
 };
