@@ -44,6 +44,7 @@ export default function DashboardPage() {
       }))
       : mockEvents;
 
+  console.log(events);
   return (
     <div className="min-h-screen bg-neutral-50 px-6 py-10 text-neutral-900">
       {/* ---------------- Header ---------------- */}

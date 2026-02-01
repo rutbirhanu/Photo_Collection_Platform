@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState} from "react";
 import {
   ImagePlus,
   UploadCloud,
@@ -8,21 +8,18 @@ import {
   AlertCircle,
   X,
 } from "lucide-react";
+import { useParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { uploadPhoto, clearPhotoError } from "@/redux/uploadSlice";
 
-export default function UploadPage({
-  params,
-}: {
-  params: { albumId: string };
-}) {
-  const { albumId } = params;
+export default function UploadPage() {
   const dispatch = useAppDispatch();
-
+  const { albumId } = useParams<{ albumId: string}>()
   const { loading, error } = useAppSelector((state) => state.upload);
 
   const [files, setFiles] = useState<File[]>([]);
   const [success, setSuccess] = useState(false);
+
 
   const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -47,7 +44,7 @@ export default function UploadPage({
       setFiles([]);
     }
   };
-
+  console.log("albumId:", albumId);
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-neutral-50 text-neutral-900">
       <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg border">
@@ -127,9 +124,8 @@ export default function UploadPage({
           <UploadCloud className="w-5 h-5" />
           {loading
             ? "Uploading..."
-            : `Upload ${files.length} photo${
-                files.length > 1 ? "s" : ""
-              }`}
+            : `Upload ${files.length} photo${files.length > 1 ? "s" : ""
+            }`}
         </button>
       </div>
     </div>

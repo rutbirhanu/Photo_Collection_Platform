@@ -12,7 +12,7 @@ exports.uploadPhoto = async (req, res) => {
 
     // 1️⃣ Find album
     const album = await prisma.album.findUnique({
-      where: { albumId },
+      where: { id: albumId },
     });
 
     if (!album) {
@@ -53,7 +53,7 @@ exports.uploadPhoto = async (req, res) => {
 
       const photo = await prisma.photo.create({
         data: {
-          albumId: album.id,
+          albumId: albumId,
           cloudinaryId: uploadResult.public_id,
           secureUrl: uploadResult.secure_url,
         },
@@ -64,7 +64,7 @@ exports.uploadPhoto = async (req, res) => {
 
     // 5️⃣ Increment uploadsUsed by COUNT
     await prisma.album.update({
-      where: { id: album.id },
+      where: { id: albumId },
       data: {
         uploadsUsed: { increment: req.files.length },
       },
