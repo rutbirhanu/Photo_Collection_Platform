@@ -9,7 +9,7 @@ export const uploadPhoto = createAsyncThunk(
       const formData = new FormData();
       files.forEach((file) => formData.append("photos", file));
 
-      const res = await fetch(`${API_URL}/upload/${albumId}`, {
+      const res = await fetch(`${API_URL}/photo/${albumId}`, {
         method: "POST",
         body: formData,
     
@@ -32,7 +32,7 @@ export const fetchAlbumPhotos = createAsyncThunk(
   "photo/fetchAlbum",
   async (albumId, { rejectWithValue }) => {
     try {
-      const res = await fetch(`${API_URL}/albums/${albumId}/photos`, {
+      const res = await fetch(`${API_URL}/photo/${albumId}`, {
         credentials: "include", // auth protected
       });
 

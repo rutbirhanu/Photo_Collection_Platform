@@ -76,3 +76,16 @@ console.log("Uploaded photos:", uploadedPhotos);
     res.status(500).json({ message: "Failed to upload photos" });
   }
 };
+
+
+
+exports.getAlbumPhotos = async (req, res) => {
+  const { albumId } = req.params;
+
+  const photos = await prisma.photo.findMany({
+    where: { albumId },
+    orderBy: { createdAt: "desc" },
+  });
+
+  res.json(photos);
+};

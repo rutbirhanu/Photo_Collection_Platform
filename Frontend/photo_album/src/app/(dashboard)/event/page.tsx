@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { fetchEvents } from "@/redux/eventSlice";
 import { QRCodeCanvas } from "qrcode.react";
-
+import Link from "next/link";
 
 /* ------------------ Mock fallback ------------------ */
 const mockEvents = [
@@ -101,9 +101,9 @@ export default function DashboardPage() {
             {/* Albums */}
             <div className="grid sm:grid-cols-2 gap-4">
               {event.albums.map((album: any) => (
-                <a
+                <Link
                   key={album.id}
-                  href={`/dashboard/albums/${album.id}`}
+                  href={`/photo/${album.id}`}
                   className="flex items-center justify-between bg-neutral-50 p-4 rounded-xl border"
                 >
                   <div className="flex items-center gap-3">
@@ -113,7 +113,7 @@ export default function DashboardPage() {
                   <span className="text-sm text-neutral-600">
                     {album.photos} photos
                   </span>
-                </a>
+                </Link>
               ))}
             </div>
           </div>
