@@ -1,6 +1,7 @@
 const stripe = require("../config/stripeConfig.js");
 const prisma = require("../config/dbConfig.js");
 
+
 exports.createCheckout = async (req, res) => {
   const { plan } = req.body;
 

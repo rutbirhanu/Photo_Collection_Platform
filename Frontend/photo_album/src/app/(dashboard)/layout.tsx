@@ -11,7 +11,9 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { usePathname, useRouter } from "next/navigation";
+import { logout } from "@/redux/authSlice";
 
 const navItems = [
   { label: "Events", href: "/event", icon: Calendar },
@@ -27,6 +29,13 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { isAuthenticated, user, error } = useAppSelector((state) => state.auth);
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push("/auth/login");
+  };
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
@@ -83,11 +92,10 @@ export default function DashboardLayout({
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                  active
-                    ? "bg-indigo-500 text-white"
-                    : "text-neutral-700 hover:bg-neutral-100"
-                }`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${active
+                  ? "bg-indigo-500 text-white"
+                  : "text-neutral-700 hover:bg-neutral-100"
+                  }`}
               >
                 <item.icon className="w-5 h-5" />
                 {item.label}
@@ -97,7 +105,7 @@ export default function DashboardLayout({
         </nav>
 
         {/* Logout */}
-        <button className="flex items-center gap-3 text-neutral-600 hover:text-neutral-900 transition mt-6">
+        <button  onClick={handleLogout} className="flex items-center gap-3 text-neutral-600 hover:text-neutral-900 transition mt-6 cursor-pointer">
           <LogOut className="w-5 h-5" />
           Logout
         </button>
