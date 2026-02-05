@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState} from "react";
+import React, { useState } from "react";
 import {
   ImagePlus,
   UploadCloud,
@@ -10,12 +10,12 @@ import {
 } from "lucide-react";
 import { useParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { uploadPhoto, clearPhotoError } from "@/redux/uploadSlice";
+import { uploadPhoto, clearPhotoError } from "@/redux/photoSlice";
 
 export default function UploadPage() {
   const dispatch = useAppDispatch();
-  const { albumId } = useParams<{ albumId: string}>()
-  const { loading, error } = useAppSelector((state) => state.upload);
+  const { albumId } = useParams<{ albumId: string }>()
+  const { loading, error } = useAppSelector((state) => state.photo);
 
   const [files, setFiles] = useState<File[]>([]);
   const [success, setSuccess] = useState(false);

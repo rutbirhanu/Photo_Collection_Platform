@@ -30,13 +30,14 @@ export const uploadPhoto = createAsyncThunk(
 
 export const fetchAlbumPhotos = createAsyncThunk(
   "photo/fetchAlbum",
-  async (albumId, { rejectWithValue }) => {
+  async (albumId: string, { rejectWithValue }) => {
     try {
       const res = await fetch(`${API_URL}/photo/${albumId}`, {
         credentials: "include", // auth protected
       });
 
       const data = await res.json();
+      console.log(data)
       if (!res.ok) throw new Error(data.message);
 
       return data; // array of photos

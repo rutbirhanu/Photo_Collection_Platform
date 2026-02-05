@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { fetchAlbumPhotos } from "@/redux/albumSlice";
+import { fetchAlbumPhotos } from "@/redux/photoSlice";
 import Image from "next/image";
 
 export default function AlbumPage() {
@@ -11,7 +11,7 @@ export default function AlbumPage() {
   const dispatch = useAppDispatch();
 
   const { photos, loading, error } = useAppSelector(
-    (state) => state.album
+    (state) => state.photo
   );
 
   useEffect(() => {
@@ -23,11 +23,12 @@ export default function AlbumPage() {
   if (loading) return <p>Loading photos...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
+  console.log("Photos in album:", photos);
   return (
     <div className="min-h-screen bg-neutral-50 px-6 py-10">
       <h1 className="text-2xl font-bold mb-6">Album Photos</h1>
 
-      {photos.length === 0 ? (
+      {!Array.isArray(photos) || photos.length === 0 ? (
         <p className="text-neutral-500">No photos uploaded yet.</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">

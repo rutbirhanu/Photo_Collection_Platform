@@ -34,6 +34,7 @@ export const fetchMyAlbums = createAsyncThunk(
       });
 
       const data = await res.json();
+      console.log("hi", data)
       if (!res.ok) throw new Error(data.message);
 
       return data;

@@ -69,7 +69,7 @@ exports.uploadPhoto = async (req, res) => {
         uploadsUsed: { increment: req.files.length },
       },
     });
-console.log("Uploaded photos:", uploadedPhotos);
+    console.log("Uploaded photos:", uploadedPhotos);
     res.status(201).json(uploadedPhotos);
   } catch (error) {
     console.error("Upload photos error:", error);
@@ -80,12 +80,19 @@ console.log("Uploaded photos:", uploadedPhotos);
 
 
 exports.getAlbumPhotos = async (req, res) => {
-  const { albumId } = req.params;
+  try {
 
-  const photos = await prisma.photo.findMany({
-    where: { albumId },
-    orderBy: { createdAt: "desc" },
-  });
+    const { albumId } = req.params;
+    const photos = await prisma.photo.findMany({
+      where: { albumId },
+      orderBy: { uploadedAt: "desc" },
+    });
 
-  res.json(photos);
+    console.log("Fetched photos:", photos);
+    res.json(photos);
+  }
+  catch (error) {
+    console.error("fetch photos error:", error);
+    res.status(500).json({ message: "Failed to fetch photos" });
+  }
 };

@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import authSlice from './authSlice'
-import uploadSlice from './uploadSlice'
+import photoSlice from './photoSlice'
 import eventSlice from './eventSlice'
 import albumSlice from './albumSlice'
 
@@ -10,7 +10,7 @@ export const makeStore = () => {
       auth: authSlice,
       event: eventSlice,
       album: albumSlice,
-      upload: uploadSlice
+      photo: photoSlice
     }
   })
 }
