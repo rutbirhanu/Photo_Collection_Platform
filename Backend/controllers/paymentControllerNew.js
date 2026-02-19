@@ -7,11 +7,8 @@ exports.createCheckout = async (req, res) => {
     const { plan, successUrl, cancelUrl } = req.body;
     const userId = req.user.id;
 
-    console.log("Payment checkout request:", { plan, userId, successUrl, cancelUrl });
-
     // Validate plan
     if (!PLANS[plan]) {
-      console.log("Invalid plan:", plan, "Available plans:", Object.keys(PLANS));
       return res.status(400).json({ message: "Invalid plan" });
     }
 
@@ -30,24 +27,21 @@ exports.createCheckout = async (req, res) => {
     }
 
     const selectedPlan = PLANS[plan];
-    console.log("Selected plan:", selectedPlan);
 
     // Create or get Stripe customer
     let customer;
     const existingUser = await prisma.user.findUnique({
       where: { id: userId },
-      select: { stripeCustomerId: true, email: true }
+      select: { stripeCustomerId: true }
     });
 
     if (existingUser.stripeCustomerId) {
       customer = await stripe.customers.retrieve(existingUser.stripeCustomerId);
-      console.log("Existing Stripe customer:", customer.id);
     } else {
       customer = await stripe.customers.create({
-        email: existingUser.email,
+        email: req.user.email,
         metadata: { userId }
       });
-      console.log("Created new Stripe customer:", customer.id);
 
       await prisma.user.update({
         where: { id: userId },
@@ -56,7 +50,7 @@ exports.createCheckout = async (req, res) => {
     }
 
     // Create checkout session
-    const sessionData = {
+    const session = await stripe.checkout.sessions.create({
       customer: customer.id,
       payment_method_types: ["card"],
       mode: "subscription",
@@ -79,13 +73,9 @@ exports.createCheckout = async (req, res) => {
         userId,
         plan
       },
-      success_url: successUrl || `${process.env.FRONTEND_URL}/dashboard/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl || `${process.env.FRONTEND_URL}/pricing/cancelled`,
-    };
-
-    console.log("Creating Stripe session with data:", sessionData);
-    const session = await stripe.checkout.sessions.create(sessionData);
-    console.log("Stripe session created:", session.id);
+      success_url: successUrl || `${process.env.FRONTEND_URL}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl || `${process.env.FRONTEND_URL}/pricing?cancelled=true`,
+    });
 
     // Create payment record
     await prisma.payment.create({
@@ -102,13 +92,9 @@ exports.createCheckout = async (req, res) => {
     res.json({ url: session.url });
   } catch (error) {
     console.error("Create checkout error:", error);
-    res.status(500).json({
-      message: "Failed to create checkout session",
-      error: error.message
-    });
+    res.status(500).json({ message: "Failed to create checkout session" });
   }
 };
-
 
 exports.stripeWebhook = async (req, res) => {
   const sig = req.headers["stripe-signature"];
@@ -288,4 +274,3 @@ exports.cancelSubscription = async (req, res) => {
     res.status(500).json({ message: "Failed to cancel subscription" });
   }
 };
-

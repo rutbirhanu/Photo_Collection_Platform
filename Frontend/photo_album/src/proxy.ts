@@ -16,7 +16,8 @@ export function proxy(request: NextRequest) {
 
 // Configuration to specify the paths where the Proxy applies
 export const config = {
-  matcher: ['/upload/:path*',
+  matcher: ['/payment/:path*',
+    '/upload/:path*',
     '/album/:path*',
     '/event/:path*',
     '/photo/:path*'],

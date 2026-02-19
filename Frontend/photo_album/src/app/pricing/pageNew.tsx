@@ -68,17 +68,17 @@ export default function PricingPage() {
 
   const handleSubscribe = async (planName: string) => {
     setLoading(planName);
-
+    
     try {
-      const response = await fetch("/api/payment/checkout", {
+      const response = await fetch("/payment/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           plan: planName.toUpperCase(),
-          successUrl: `${window.location.origin}/dashboard/success`,
-          cancelUrl: `${window.location.origin}/pricing/cancelled`,
+          successUrl: `${window.location.origin}/dashboard?success=true`,
+          cancelUrl: `${window.location.origin}/pricing?cancelled=true`,
         }),
       });
 
@@ -125,10 +125,11 @@ export default function PricingPage() {
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-2xl border-2 ${plan.popular
-                ? "border-indigo-500 shadow-xl"
-                : "border-gray-200"
-                } ${plan.color} p-8`}
+              className={`relative rounded-2xl border-2 ${
+                plan.popular
+                  ? "border-indigo-500 shadow-xl"
+                  : "border-gray-200"
+              } ${plan.color} p-8`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
@@ -159,8 +160,9 @@ export default function PricingPage() {
                       <X className="text-gray-400 mt-0.5" size={18} />
                     )}
                     <span
-                      className={`${feature.included ? "text-gray-900" : "text-gray-400"
-                        }`}
+                      className={`${
+                        feature.included ? "text-gray-900" : "text-gray-400"
+                      }`}
                     >
                       {feature.text}
                     </span>
@@ -192,7 +194,7 @@ export default function PricingPage() {
           <h2 className="text-3xl font-bold text-center mb-12">
             Frequently Asked Questions
           </h2>
-
+          
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-xl border border-gray-200">
               <h3 className="font-semibold mb-2">Can I change my plan later?</h3>
@@ -200,21 +202,21 @@ export default function PricingPage() {
                 Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately.
               </p>
             </div>
-
+            
             <div className="bg-white p-6 rounded-xl border border-gray-200">
               <h3 className="font-semibold mb-2">What happens if I exceed my limits?</h3>
               <p className="text-gray-600">
                 You'll be prompted to upgrade your plan when you reach your event or photo limits.
               </p>
             </div>
-
+            
             <div className="bg-white p-6 rounded-xl border border-gray-200">
               <h3 className="font-semibold mb-2">Do my photos expire?</h3>
               <p className="text-gray-600">
                 Photos are stored permanently. Only QR codes have expiry dates based on your plan.
               </p>
             </div>
-
+            
             <div className="bg-white p-6 rounded-xl border border-gray-200">
               <h3 className="font-semibold mb-2">Is there a contract?</h3>
               <p className="text-gray-600">

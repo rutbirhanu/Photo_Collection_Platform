@@ -12,6 +12,19 @@ enum PaymentStatus {
   PENDING
   PAID
   FAILED
+  CANCELLED
+}
+
+enum Plan {
+  FREE
+  PRO
+  PREMIUM
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
 }
 
 model User {
@@ -20,11 +33,13 @@ model User {
   email        String @unique
   passwordHash String
 
-  isPaid Boolean @default(false)
-  plan   String
-
+  plan             Plan              @default(FREE)
+  subscriptionId   String?            @unique
+  subscriptionStatus SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId String?           @unique
+  
   events  Event[]
-  payment Payment?
+  payments Payment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -32,16 +47,21 @@ model User {
 
 model Payment {
   id     String @id @default(cuid())
-  userId String @unique
+  userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  stripeSessionId String        @unique
-  amount          Int
-  currency        String        @default("USD")
-  status          PaymentStatus
-
+  stripeSessionId    String @unique
+  stripePaymentIntent String?
+  amount             Int
+  currency           String @default("USD")
+  status             PaymentStatus
+  
+  plan             Plan
+  subscriptionId   String?
+  
   paidAt    DateTime?
-  createdAt DateTime  @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Event {

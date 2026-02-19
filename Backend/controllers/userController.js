@@ -1,6 +1,7 @@
 const prisma = require("../config/dbConfig.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { Plan } = require("@prisma/client");
 
 // const { OAuth2Client } = require("google-auth-library");
 // const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -8,7 +9,7 @@ const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, plan = 'FREE' } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -16,7 +17,14 @@ exports.register = async (req, res) => {
       });
     }
 
-    // 2. Check if user already exists
+    // Validate plan
+    if (!Object.values(Plan).includes(plan)) {
+      return res.status(400).json({
+        message: "Invalid plan. Must be FREE, PRO, or PREMIUM",
+      });
+    }
+
+    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -27,16 +35,16 @@ exports.register = async (req, res) => {
       });
     }
 
-    // 3. Hash password
+    // Hash password
     const passwordHash = await bcrypt.hash(password, 12);
 
-    // 4. Create user
+    // Create user
     const user = await prisma.user.create({
       data: {
         name,
         email,
         passwordHash,
-        plan: "FREE",
+        plan: plan,
       },
       select: {
         id: true,
@@ -46,7 +54,8 @@ exports.register = async (req, res) => {
         createdAt: true,
       },
     });
-    // 5. Return safe response
+
+    // Return safe response
     return res.status(201).json({
       message: "User registered successfully",
       user,
@@ -59,24 +68,29 @@ exports.register = async (req, res) => {
   }
 };
 
-
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   const user = await prisma.user.findUnique({ where: { email } });
-
+  console.log("Login attempt for:", email);
   if (!user || !(await bcrypt.compare(password, user.passwordHash)))
     return res.status(401).json({ message: "Invalid credentials" });
 
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+  //   res.cookie("token", token, {
+  //     httpOnly: true,
+  //     secure: false,
+  //     sameSite: "strict",
+  //     maxAge: 7 * 24 * 60 * 60 * 1000,
+  //   });
+
   res.cookie("token", token, {
     httpOnly: true,
-    secure: false,
-    sameSite: "strict",
+    secure: true,     // true ONLY in HTTPS production
+    sameSite: "lax",   // 🔥 THIS FIXES MOBILE & PORT FORWARDING
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   res.json({ token });
 };
-
 
 exports.getCurrentUser = async (req, res) => {
   try {
@@ -89,6 +103,7 @@ exports.getCurrentUser = async (req, res) => {
         name: true,
         email: true,
         plan: true,
+        subscriptionStatus: true,
         createdAt: true,
       },
     });
@@ -104,7 +119,6 @@ exports.getCurrentUser = async (req, res) => {
   }
 };
 
-
 exports.logout = (req, res) => {
   try {
     res.clearCookie("token", {
@@ -119,7 +133,6 @@ exports.logout = (req, res) => {
     res.status(500).json({ message: "Logout failed" });
   }
 };
-
 
 // exports.googleLogin = async (req, res) => {
 //   const { idToken } = req.body; // frontend sends Google ID token

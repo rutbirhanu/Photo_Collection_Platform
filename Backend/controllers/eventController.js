@@ -1,22 +1,24 @@
 const prisma = require("../config/dbConfig.js");
 const QRCode = require("qrcode");
 const crypto = require("crypto");
-const PLANS = {
-  FREE: { price: 0, guests: 20, photos: 100 },
-  BASIC: { price: 2000, guests: 100, photos: 1000 },
-  PRO: { price: 5000, guests: 500, photos: 10000 }
-};
+const { PLANS, canCreateEvent, getUploadLimit } = require("../config/plans.js");
 
 exports.createEvent = async (req, res) => {
   try {
     const user = req.user;
     const { eventType } = req.body;
-    console.log(user)
 
-    // 1️⃣ Payment gate
-    // if (!user.isPaid) {
-    //   return res.status(403).json({ message: "Payment required" });
-    // }
+    // 1️⃣ Check if user can create more events based on plan
+    const currentEventCount = await prisma.event.count({
+      where: { userId: user.id }
+    });
+
+    if (!canCreateEvent(user, currentEventCount)) {
+      const planLimits = PLANS[user.plan].features;
+      return res.status(403).json({
+        message: `Event limit reached. Your ${user.plan} plan allows ${planLimits.maxEvents === -1 ? 'unlimited' : planLimits.maxEvents} events.`
+      });
+    }
 
     // 2️⃣ Create Event
     const event = await prisma.event.create({
@@ -29,9 +31,8 @@ exports.createEvent = async (req, res) => {
     // 3️⃣ Generate album public token
     const publicToken = crypto.randomUUID();
 
-    // 4️⃣ Determine upload limit from plan
-    console.log("User Plan:", user.plan);
-    const uploadLimit = 10;
+    // 4️⃣ Get upload limit from user's plan
+    const uploadLimit = getUploadLimit(user.plan);
 
     // 5️⃣ Create Album
     const album = await prisma.album.create({
@@ -52,6 +53,7 @@ exports.createEvent = async (req, res) => {
       album,
       qrCode: qrCodeBase64,
       uploadUrl,
+      planLimits: PLANS[user.plan].features
     });
   } catch (error) {
     console.error(error);
