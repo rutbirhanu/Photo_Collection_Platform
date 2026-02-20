@@ -23,7 +23,7 @@ export default function PaymentSuccessPage() {
       setLoading(false);
     }, 2000);
 
-    // You could also verify the session with your backend here
+    // You could also verify session with your backend here
     if (sessionId) {
       // verifyPaymentSession(sessionId);
     }
@@ -67,15 +67,15 @@ export default function PaymentSuccessPage() {
             </h2>
             <ul className="text-left space-y-3 text-gray-600">
               <li className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />
                 <span>Your account has been upgraded</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />
                 <span>New features are now available</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />
                 <span>Manage your subscription anytime</span>
               </li>
             </ul>
@@ -83,10 +83,10 @@ export default function PaymentSuccessPage() {
 
           <div className="space-y-3">
             <button
-              onClick={() => router.push("/dashboard")}
+              onClick={() => router.push("/event")}
               className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
             >
-              Go to Dashboard
+              Go to Events
             </button>
             
             <button
@@ -96,10 +96,6 @@ export default function PaymentSuccessPage() {
               View Plans
             </button>
           </div>
-
-          <p className="text-sm text-gray-500 mt-6">
-            A confirmation email has been sent to your registered email address.
-          </p>
         </div>
       </div>
     </div>

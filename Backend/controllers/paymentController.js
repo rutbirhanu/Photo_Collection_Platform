@@ -79,7 +79,7 @@ exports.createCheckout = async (req, res) => {
         userId,
         plan
       },
-      success_url: successUrl || `${process.env.FRONTEND_URL}/dashboard/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: successUrl || `${process.env.FRONTEND_URL}/pricing/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl || `${process.env.FRONTEND_URL}/pricing/cancelled`,
     };
 

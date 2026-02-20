@@ -70,24 +70,38 @@ export default function PricingPage() {
     setLoading(planName);
 
     try {
-      const response = await fetch("/api/payment/checkout", {
+      // Get auth token from cookies
+      // const getCookie = (name: string) => {
+      //   const value = `; ${document.cookie}`;
+      //   const parts = value.split(`; ${name}=`);
+      //   if (parts.length === 2) return parts.pop()?.split(';').shift();
+      //   return null;
+      // };
+
+      // const token = getCookie('token');
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+
+      const response = await fetch(`${backendUrl}/payment/checkout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
+
         body: JSON.stringify({
           plan: planName.toUpperCase(),
-          successUrl: `${window.location.origin}/dashboard/success`,
+          successUrl: `${window.location.origin}/pricing/success`,
           cancelUrl: `${window.location.origin}/pricing/cancelled`,
         }),
       });
 
       const data = await response.json();
+      console.log(data)
 
       if (response.ok) {
         if (planName === "Free") {
           // Free plan activated, redirect to dashboard
-          window.location.href = "/dashboard";
+          window.location.href = "/event";
         } else {
           // Redirect to Stripe checkout
           window.location.href = data.url;
