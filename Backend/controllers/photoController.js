@@ -120,3 +120,68 @@ exports.getAlbumPhotos = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch photos" });
   }
 };
+exports.deletePhoto = async (req, res) => {
+  try {
+    const { photoId } = req.params;
+    const userId = req.user.id;
+
+    // 1️⃣ Find photo with album and event info
+    const photo = await prisma.photo.findUnique({
+      where: { id: photoId },
+      include: {
+        album: {
+          include: {
+            event: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!photo) {
+      return res.status(404).json({ message: "Photo not found" });
+    }
+
+    // 2️⃣ Ownership check
+    if (photo.album.event.user.id !== userId) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized to delete this photo" });
+    }
+
+    // 3️⃣ Delete from Cloudinary (non-blocking logic)
+    if (photo.cloudinaryId) {
+      try {
+        await cloudinary.uploader.destroy(photo.cloudinaryId);
+        console.log(`Deleted from Cloudinary: ${photo.cloudinaryId}`);
+      } catch (cloudinaryError) {
+        console.error("Cloudinary delete failed:", cloudinaryError);
+        // continue anyway
+      }
+    }
+
+    // 4️⃣ Transaction: delete photo + decrement album uploadsUsed
+    await prisma.$transaction([
+      prisma.photo.delete({
+        where: { id: photoId },
+      }),
+
+      prisma.album.update({
+        where: { id: photo.album.id },
+        data: {
+          uploadsUsed: {
+            decrement: 1,
+          },
+        },
+      }),
+    ]);
+
+    res.json({ message: "Photo deleted successfully" });
+  } catch (error) {
+    console.error("Delete photo error:", error);
+    res.status(500).json({ message: "Failed to delete photo" });
+  }
+};

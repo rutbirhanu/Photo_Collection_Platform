@@ -87,6 +87,18 @@ exports.createCheckout = async (req, res) => {
     const session = await stripe.checkout.sessions.create(sessionData);
     console.log("Stripe session created:", session.id);
 
+    // For paid plans, update user immediately to show new plan (will be confirmed by webhook)
+    if (plan !== 'FREE') {
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          plan: plan,
+          // Note: isPaid will be updated by webhook when payment is confirmed
+        }
+      });
+      console.log(`User ${userId} plan updated to ${plan} (pending payment confirmation)`);
+    }
+
     // Create payment record
     await prisma.payment.create({
       data: {

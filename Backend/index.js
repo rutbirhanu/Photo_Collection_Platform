@@ -40,6 +40,8 @@ app.use("/album", require("./routes/albumRoute"));
 
 app.use("/photo", require("./routes/photoRoute"));
 
+app.use("/auth", require("./routes/userStatsRoute"));
+
 
 
 app.listen(5000, () => {

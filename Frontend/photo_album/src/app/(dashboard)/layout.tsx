@@ -19,7 +19,7 @@ const navItems = [
   { label: "Events", href: "/event", icon: Calendar },
   { label: "Albums", href: "/album", icon: Images },
   // { label: "Account", href: "/account", icon: User },
-  { label: "Billing", href: "/pricing", icon: CreditCard },
+  { label: "Billing", href: "/bill", icon: CreditCard },
 ];
 
 export default function DashboardLayout({

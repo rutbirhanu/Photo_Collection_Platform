@@ -56,10 +56,11 @@ const canCreateEvent = (user, currentEventCount) => {
 };
 
 const canUploadPhotos = (album, photoCount) => {
-  // Get the user plan through the event
-  const plan = PLANS.FREE; // Default to FREE if we can't determine plan
-  return plan.features.maxPhotosPerEvent === -1 || 
-         (album.uploadsUsed + photoCount) <= plan.features.maxPhotosPerEvent;
+  // Get the user plan through the album
+  const userPlan = album?.event?.user?.plan || 'FREE';
+  const plan = PLANS[userPlan];
+  return plan.features.maxPhotosPerEvent === -1 ||
+    (album.uploadsUsed + photoCount) <= plan.features.maxPhotosPerEvent;
 };
 
 const getUploadLimit = (userPlan) => {

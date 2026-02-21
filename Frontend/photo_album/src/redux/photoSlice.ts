@@ -1,81 +1,106 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
-export const uploadPhoto = createAsyncThunk(
-  "photo/upload",
-  async ({ files, albumId }:{ files: File[]; albumId: string }, { rejectWithValue }) => {
-    try {
-      const formData = new FormData();
-      files.forEach((file) => formData.append("photos", file));
+/* ========================
+   TYPES
+======================== */
 
-      const res = await fetch(`${API_URL}/photo/${albumId}`, {
-        method: "POST",
-        body: formData,
-    
-      });
+interface Photo {
+  id: string;
+  secureUrl: string;
+  albumId: string;
+}
 
-      const data = await res.json();
-      console.log(data)
-      if (!res.ok) throw new Error(data.message);
+interface PhotoState {
+  photos: Photo[];
+  loading: boolean;
+  error: string | null;
+  deletingPhotoId: string | null;
+}
 
-      return data;
-    } catch (err) {
-      console.log(err)
-      return rejectWithValue(err.message);
-    }
+/* ========================
+   THUNKS
+======================== */
+
+export const uploadPhoto = createAsyncThunk<
+  Photo,
+  { files: File[]; albumId: string },
+  { rejectValue: string }
+>("photo/upload", async ({ files, albumId }, { rejectWithValue }) => {
+  try {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("photos", file));
+
+    const res = await fetch(`${API_URL}/photo/${albumId}`, {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+
+    return data;
+  } catch (err: any) {
+    return rejectWithValue(err.message);
   }
-);
+});
 
+export const fetchAlbumPhotos = createAsyncThunk<
+  Photo[],
+  string,
+  { rejectValue: string }
+>("photo/fetchAlbum", async (albumId, { rejectWithValue }) => {
+  try {
+    const res = await fetch(`${API_URL}/photo/${albumId}`, {
+      credentials: "include",
+    });
 
-export const fetchAlbumPhotos = createAsyncThunk(
-  "photo/fetchAlbum",
-  async (albumId: string, { rejectWithValue }) => {
-    try {
-      const res = await fetch(`${API_URL}/photo/${albumId}`, {
-        credentials: "include", // auth protected
-      });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
 
-      const data = await res.json();
-      console.log(data)
-      if (!res.ok) throw new Error(data.message);
-
-      return data; // array of photos
-    } catch (err) {
-      return rejectWithValue(err.message);
-    }
+    return data;
+  } catch (err: any) {
+    return rejectWithValue(err.message);
   }
-);
+});
 
+export const deletePhoto = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>("photo/delete", async (photoId, { rejectWithValue }) => {
+  try {
+    const res = await fetch(`${API_URL}/photo/${photoId}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
 
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
 
-export const deletePhoto = createAsyncThunk(
-  "photo/delete",
-  async (photoId, { rejectWithValue }) => {
-    try {
-      const res = await fetch(`${API_URL}/photos/${photoId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-
-      return photoId; // return deleted id
-    } catch (err) {
-      return rejectWithValue(err.message);
-    }
+    return photoId;
+  } catch (err: any) {
+    return rejectWithValue(err.message);
   }
-);
+});
 
+/* ========================
+   SLICE
+======================== */
+
+const initialState: PhotoState = {
+  photos: [],
+  loading: false,
+  error: null,
+  deletingPhotoId: null,
+};
 
 const photoSlice = createSlice({
   name: "photo",
-  initialState: {
-    photos: [],
-    loading: false,
-    error: null,
-  },
+  initialState,
   reducers: {
     clearPhotoError(state) {
       state.error = null;
@@ -86,21 +111,22 @@ const photoSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // UPLOAD
+
+      /* ========= UPLOAD ========= */
       .addCase(uploadPhoto.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(uploadPhoto.fulfilled, (state, action) => {
         state.loading = false;
-        state.photos.unshift(action.payload); // newest on top
+        state.photos.unshift(action.payload);
       })
       .addCase(uploadPhoto.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Upload failed";
       })
 
-      // FETCH
+      /* ========= FETCH ========= */
       .addCase(fetchAlbumPhotos.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -111,12 +137,23 @@ const photoSlice = createSlice({
       })
       .addCase(fetchAlbumPhotos.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Failed to fetch photos";
       })
 
-      // DELETE
+      /* ========= DELETE ========= */
+      .addCase(deletePhoto.pending, (state, action) => {
+        state.deletingPhotoId = action.meta.arg;
+        state.error = null;
+      })
       .addCase(deletePhoto.fulfilled, (state, action) => {
-        state.photos = state.photos.filter((p) => p.id !== action.payload);
+        state.photos = state.photos.filter(
+          (photo) => photo.id !== action.payload
+        );
+        state.deletingPhotoId = null;
+      })
+      .addCase(deletePhoto.rejected, (state, action) => {
+        state.error = action.payload || "Delete failed";
+        state.deletingPhotoId = null;
       });
   },
 });
