@@ -1,6 +1,0 @@
-{
-  "buildCommand": "cd Frontend/photo_album && npm run build",
-  "outputDirectory": "Frontend/photo_album/.next",
-  "installCommand": "cd Frontend/photo_album && npm install",
-  "framework": "nextjs"
-}
