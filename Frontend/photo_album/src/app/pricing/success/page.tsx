@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { Suspense, useEffect, useState } from "react";
+import { CheckCircle, Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -52,11 +52,11 @@ export default function PaymentSuccessPage() {
           <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
             <CheckCircle className="h-10 w-10 text-green-500" />
           </div>
-          
+
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Payment Successful!
           </h1>
-          
+
           <p className="text-lg text-gray-600 mb-8">
             {plan ? `Welcome to the ${plan} plan!` : "Your subscription has been activated successfully."}
           </p>
@@ -88,7 +88,7 @@ export default function PaymentSuccessPage() {
             >
               Go to Events
             </button>
-            
+
             <button
               onClick={() => router.push("/pricing")}
               className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors"
@@ -99,5 +99,19 @@ export default function PaymentSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <Loader2 className="h-16 w-16 text-green-500 animate-spin" />
+        </div>
+      }
+    >
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }

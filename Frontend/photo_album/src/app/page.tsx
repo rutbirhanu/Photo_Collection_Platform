@@ -205,7 +205,7 @@ export default function HomePage() {
 
 /* -------- Components -------- */
 
-function Step({ icon, title, desc }) {
+function Step({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
     <div className="text-center">
       <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
@@ -217,7 +217,7 @@ function Step({ icon, title, desc }) {
   );
 }
 
-function Feature({ text }) {
+function Feature({ text }: { text: string }) {
   return (
     <li className="flex items-center gap-3 text-neutral-700">
       <ShieldCheck size={18} className="text-indigo-500" />
@@ -226,7 +226,7 @@ function Feature({ text }) {
   );
 }
 
-function UseCase({ title }) {
+function UseCase({ title }: { title: string }) {
   return (
     <div className="border border-neutral-200 rounded-2xl p-6 text-center bg-white shadow-sm">
       <h3 className="font-semibold text-lg">{title}</h3>

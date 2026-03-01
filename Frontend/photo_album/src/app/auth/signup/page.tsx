@@ -18,11 +18,11 @@ export default function SignupPage() {
     password: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(register(form));
   };
@@ -36,7 +36,7 @@ export default function SignupPage() {
 
   // Clear error on unmount
   useEffect(() => {
-    return () => dispatch(clearAuthError());
+    return () => { dispatch(clearAuthError()); };
   }, [dispatch]);
 
   return (

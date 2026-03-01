@@ -1,7 +1,21 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+interface Album {
+  id: string;
+  name: string;
+  eventId: string;
+  shareToken?: string;
+  [key: string]: unknown;
+}
 
-export const createAlbum = createAsyncThunk(
+interface AlbumState {
+  albums: Album[];
+  currentAlbum: Album | null;
+  loading: boolean;
+  error: string | null;
+}
+
+export const createAlbum = createAsyncThunk<Album, Record<string, unknown>, { rejectValue: string }>(
   "album/create",
   async (payload, { rejectWithValue }) => {
     try {
@@ -19,13 +33,13 @@ export const createAlbum = createAsyncThunk(
 
       return data;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err instanceof Error ? err.message : "Unknown error");
     }
   }
 );
 
 
-export const fetchMyAlbums = createAsyncThunk(
+export const fetchMyAlbums = createAsyncThunk<Album[], void, { rejectValue: string }>(
   "album/fetchMyAlbums",
   async (_, { rejectWithValue }) => {
     try {
@@ -39,13 +53,13 @@ export const fetchMyAlbums = createAsyncThunk(
 
       return data;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err instanceof Error ? err.message : "Unknown error");
     }
   }
 );
 
 
-export const fetchAlbumById = createAsyncThunk(
+export const fetchAlbumById = createAsyncThunk<Album, string, { rejectValue: string }>(
   "album/fetchById",
   async (id, { rejectWithValue }) => {
     try {
@@ -58,13 +72,13 @@ export const fetchAlbumById = createAsyncThunk(
 
       return data;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err instanceof Error ? err.message : "Unknown error");
     }
   }
 );
 
 
-export const fetchAlbumByToken = createAsyncThunk(
+export const fetchAlbumByToken = createAsyncThunk<Album, string, { rejectValue: string }>(
   "album/fetchByToken",
   async (token, { rejectWithValue }) => {
     try {
@@ -74,13 +88,13 @@ export const fetchAlbumByToken = createAsyncThunk(
       if (!res.ok) throw new Error(data.message);
       return data;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err instanceof Error ? err.message : "Unknown error");
     }
   }
 );
 
 
-export const updateAlbum = createAsyncThunk(
+export const updateAlbum = createAsyncThunk<Album, { id: string; payload: Record<string, unknown> }, { rejectValue: string }>(
   "album/update",
   async({ id, payload }, { rejectWithValue }) => {
     try {
@@ -98,14 +112,14 @@ export const updateAlbum = createAsyncThunk(
 
       return data;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err instanceof Error ? err.message : "Unknown error");
     }
   }
 );
 
 
 
-export const deleteAlbum = createAsyncThunk(
+export const deleteAlbum = createAsyncThunk<string, string, { rejectValue: string }>(
   "album/delete",
   async (id, { rejectWithValue }) => {
     try {
@@ -119,21 +133,23 @@ export const deleteAlbum = createAsyncThunk(
 
       return id;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err instanceof Error ? err.message : "Unknown error");
     }
   }
 );
 
 
 
+const initialState: AlbumState = {
+  albums: [],
+  currentAlbum: null,
+  loading: false,
+  error: null,
+};
+
 const albumSlice = createSlice({
   name: "album",
-  initialState: {
-    albums: [],
-    currentAlbum: null,
-    loading: false,
-    error: null,
-  },
+  initialState,
   reducers: {
     clearAlbumError(state) {
       state.error = null;
@@ -154,7 +170,7 @@ const albumSlice = createSlice({
       })
       .addCase(createAlbum.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload ?? null;
       })
 
       // FETCH ALL
@@ -167,7 +183,7 @@ const albumSlice = createSlice({
       })
       .addCase(fetchMyAlbums.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload ?? null;
       })
 
       // FETCH ONE (AUTH)
@@ -180,7 +196,7 @@ const albumSlice = createSlice({
       })
       .addCase(fetchAlbumById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload ?? null;
       })
 
       // FETCH BY TOKEN (PUBLIC)
@@ -193,7 +209,7 @@ const albumSlice = createSlice({
       })
       .addCase(fetchAlbumByToken.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload ?? null;
       })
 
       // UPDATE

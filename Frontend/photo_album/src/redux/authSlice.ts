@@ -1,20 +1,34 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 
-interface signupPayload{
-  name: string,
-  email: string,
-  password: string
+interface SignupPayload {
+  name: string;
+  email: string;
+  password: string;
 }
 
-interface loginPayload{
-  email: string,
-  password: string
-} 
+interface LoginPayload {
+  email: string;
+  password: string;
+}
 
-export const register = createAsyncThunk(
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  [key: string]: unknown;
+}
+
+interface AuthState {
+  user: User | null;
+  loading: boolean;
+  error: string | null;
+  isAuthenticated: boolean;
+}
+
+export const register = createAsyncThunk<User, SignupPayload, { rejectValue: string }>(
   "auth/register",
-  async (payload: signupPayload, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
         method: "POST",
@@ -30,22 +44,22 @@ export const register = createAsyncThunk(
 
       return data.user;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err instanceof Error ? err.message : "Unknown error");
     }
   }
 );
 
 
-export const login = createAsyncThunk(
+export const login = createAsyncThunk<void, LoginPayload, { rejectValue: string }>(
   "auth/login",
-  async (payload: loginPayload, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", 
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 
@@ -55,32 +69,32 @@ export const login = createAsyncThunk(
 
       return data;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err instanceof Error ? err.message : "Unknown error");
     }
   }
 );
 
 
 
-export const fetchCurrentUser = createAsyncThunk(
+export const fetchCurrentUser = createAsyncThunk<User, void, { rejectValue: string }>(
   "auth/currentUser",
   async (_, { rejectWithValue }) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
-        credentials: "include", // 
+        credentials: "include", //
       });
 
       if (!res.ok) throw new Error("Not authenticated");
 
       return await res.json();
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err instanceof Error ? err.message : "Unknown error");
     }
   }
 );
 
 
-export const logout = createAsyncThunk(
+export const logout = createAsyncThunk<true, void, { rejectValue: string }>(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
@@ -93,21 +107,23 @@ export const logout = createAsyncThunk(
 
       return true;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err instanceof Error ? err.message : "Unknown error");
     }
   }
 );
 
 
 
+const initialState: AuthState = {
+  user: null,
+  loading: false,
+  error: null,
+  isAuthenticated: false,
+};
+
 const authSlice = createSlice({
   name: "auth",
-  initialState: {
-    user: null,
-    loading: false,
-    error: null,
-    isAuthenticated: false,
-  },
+  initialState,
   reducers: {
     clearAuthError(state) {
       state.error = null;
@@ -125,7 +141,7 @@ const authSlice = createSlice({
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload ?? null;
       })
 
       // LOGIN
@@ -139,7 +155,7 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload ?? null;
       })
 
       // FETCH ME

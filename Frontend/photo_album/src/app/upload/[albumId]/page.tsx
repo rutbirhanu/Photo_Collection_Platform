@@ -22,8 +22,9 @@ export default function UploadPage() {
 
 
   const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    setFiles((prev) => [...prev, ...Array.from(e.target.files)]);
+    const selected = e.target.files;
+    if (!selected) return;
+    setFiles((prev) => [...prev, ...Array.from(selected)]);
     setSuccess(false);
     dispatch(clearPhotoError());
   };

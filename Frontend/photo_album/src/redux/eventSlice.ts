@@ -1,17 +1,32 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-interface eventData {
+interface EventData {
   eventType: string;
   description: string;
   date: string;
 }
 
+interface Event {
+  id: string;
+  eventType: string;
+  description: string;
+  date: string;
+  [key: string]: unknown;
+}
+
+interface EventState {
+  events: Event[];
+  currentEvent: Event | null;
+  loading: boolean;
+  error: string | null;
+  success: boolean;
+}
 
 // Fetch all events
-export const fetchEvents = createAsyncThunk(
+export const fetchEvents = createAsyncThunk<Event[], void, { rejectValue: string }>(
   "events/fetch",
   async () => {
-    const res = await fetch(`http://localhost:5000/event`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -29,7 +44,7 @@ export const fetchEvents = createAsyncThunk(
   }
 );
 
-export const fetchEventById = createAsyncThunk(
+export const fetchEventById = createAsyncThunk<Event, string, { rejectValue: string }>(
   "events/fetchById",
   async (eventId, { rejectWithValue }) => {
     try {
@@ -43,15 +58,15 @@ export const fetchEventById = createAsyncThunk(
 
       return data;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err instanceof Error ? err.message : "Unknown error");
     }
   }
 );
 
 // Create a new event
-export const createEvent = createAsyncThunk(
+export const createEvent = createAsyncThunk<{ event: Event }, EventData, { rejectValue: string }>(
   "events/create",
-  async (data: eventData, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event/create-event`, {
       method: "POST",
       credentials: "include",
@@ -72,7 +87,7 @@ export const createEvent = createAsyncThunk(
 );
 
 
-export const updateEvent = createAsyncThunk(
+export const updateEvent = createAsyncThunk<Event, { eventId: string; payload: Record<string, unknown> }, { rejectValue: string }>(
   "events/update",
   async ({ eventId, payload }, { rejectWithValue }) => {
     try {
@@ -88,18 +103,16 @@ export const updateEvent = createAsyncThunk(
 
       return data;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err instanceof Error ? err.message : "Unknown error");
     }
   }
 );
 
 
-export const deleteEvent = createAsyncThunk(
+export const deleteEvent = createAsyncThunk<string, string, { rejectValue: string }>(
   "events/delete",
   async (eventId, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event/${eventId}`, {
         method: "DELETE",
         credentials: "include",
@@ -112,22 +125,24 @@ export const deleteEvent = createAsyncThunk(
 
       return eventId;
     } catch (err) {
-      return rejectWithValue(err.message);
+      return rejectWithValue(err instanceof Error ? err.message : "Unknown error");
     }
   }
 );
 
 
 
+const initialState: EventState = {
+  events: [],
+  currentEvent: null,
+  loading: false,
+  error: null,
+  success: false,
+};
+
 const eventSlice = createSlice({
   name: "events",
-  initialState: {
-    events: [],
-    currentEvent: null,
-    loading: false,
-    error: null,
-    success: false,
-  },
+  initialState,
   reducers: {
     clearCurrentEvent(state) {
       state.currentEvent = null;
@@ -147,7 +162,7 @@ const eventSlice = createSlice({
       })
       .addCase(createEvent.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Something went wrong";
+        state.error = action.payload ?? "Something went wrong";
       })
 
       // FETCH ALL
@@ -160,7 +175,7 @@ const eventSlice = createSlice({
       })
       .addCase(fetchEvents.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload ?? null;
       })
 
       // FETCH ONE
@@ -188,4 +203,5 @@ const eventSlice = createSlice({
   },
 });
 
+export const { clearCurrentEvent } = eventSlice.actions;
 export default eventSlice.reducer;
