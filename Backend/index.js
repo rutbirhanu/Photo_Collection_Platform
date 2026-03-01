@@ -12,7 +12,11 @@ app.use(
 
   cors({
 
-    origin: ["http://localhost:3000", "https://7zmrp3b3-3000.uks1.devtunnels.ms"],
+    origin: [
+      "http://localhost:3000",
+      "https://7zmrp3b3-3000.uks1.devtunnels.ms",
+      process.env.FRONTEND_URL,
+    ].filter(Boolean),
 
     credentials: true,
 
